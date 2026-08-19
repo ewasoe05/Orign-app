@@ -4,6 +4,8 @@ import { SavingsHero } from "@/components/dashboard/savings-hero";
 import { MonthlyPaymentWidget } from "@/components/dashboard/monthly-payment-widget";
 import { FitnessWeekWidget } from "@/components/dashboard/fitness-week-widget";
 import { ReviewReminderWidget } from "@/components/dashboard/review-reminder-widget";
+import { RemindersPanel } from "@/components/dashboard/reminders-panel";
+import { DashboardSundayOrder } from "@/components/dashboard/dashboard-sunday-order";
 import { MilestoneWidget } from "@/components/dashboard/milestone-widget";
 import { SavingsWidget } from "@/components/dashboard/savings-widget";
 import { BusinessWeekWidget } from "@/components/dashboard/business-week-widget";
@@ -15,9 +17,9 @@ import {
   getUserSettings,
 } from "@/lib/actions/debt";
 import { getFitnessDashboardSummary } from "@/lib/actions/fitness";
-import { getReviewDue } from "@/lib/actions/review";
+import { getBusinessWeekStats, getFollowUpQueue } from "@/lib/actions/business";
+import { getRemindersContext } from "@/lib/actions/reminders";
 import { getSavingsSummary } from "@/lib/actions/savings";
-import { getBusinessWeekStats } from "@/lib/actions/business";
 import { getHabitFloorStatuses } from "@/lib/actions/habits";
 import { getUserProjection } from "@/lib/actions/projection";
 import { seedUserData } from "@/lib/actions/auth";
@@ -43,9 +45,10 @@ export default async function DashboardPage() {
     settings,
     paidThisMonth,
     fitnessSummary,
-    reviewDue,
+    remindersContext,
     savingsSummary,
     businessStats,
+    followUps,
     habits,
     projection,
   ] = await Promise.all([
@@ -54,9 +57,10 @@ export default async function DashboardPage() {
     getUserSettings(),
     getMonthlyPayments(new Date().getFullYear(), new Date().getMonth() + 1),
     getFitnessDashboardSummary(),
-    getReviewDue(),
+    getRemindersContext(),
     getSavingsSummary(),
     getBusinessWeekStats(),
+    getFollowUpQueue(),
     getHabitFloorStatuses(),
     getUserProjection(),
   ]);
@@ -69,50 +73,58 @@ export default async function DashboardPage() {
 
   return (
     <AppShell>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="lg:col-span-2">
-          <FourOutcomes
-            totalDebt={totalDebt}
-            cashOnHand={savingsSummary.cashOnHand}
-            weekCommission={businessStats.estimatedCommission}
-            fitnessLabel={phase}
-            debtFreeLabel={projection.debtFreeLabel}
-            closingLabel={projection.closingLabel}
-          />
-        </div>
-        <div className="lg:col-span-2">
-          {debtFree ? (
-            <SavingsHero
-              summary={savingsSummary}
-              planStartDate={planStartDate}
-              bundle={projection}
-            />
-          ) : (
-            <DebtHero
+      <DashboardSundayOrder
+        reviewWidget={<ReviewReminderWidget context={remindersContext} />}
+      >
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="lg:col-span-2">
+            <RemindersPanel context={remindersContext} />
+          </div>
+          <div className="lg:col-span-2">
+            <FourOutcomes
               totalDebt={totalDebt}
-              planStartDate={planStartDate}
-              bundle={projection}
+              cashOnHand={savingsSummary.cashOnHand}
+              weekCommission={businessStats.estimatedCommission}
+              fitnessLabel={phase}
+              debtFreeLabel={projection.debtFreeLabel}
+              closingLabel={projection.closingLabel}
             />
+          </div>
+          <div className="lg:col-span-2">
+            {debtFree ? (
+              <SavingsHero
+                summary={savingsSummary}
+                planStartDate={planStartDate}
+                bundle={projection}
+              />
+            ) : (
+              <DebtHero
+                totalDebt={totalDebt}
+                planStartDate={planStartDate}
+                bundle={projection}
+              />
+            )}
+          </div>
+          <div className="lg:col-span-2">
+            <HabitsStrip habits={habits} />
+          </div>
+          {debtFree ? (
+            <MilestoneWidget title={milestone.title} description={milestone.description} />
+          ) : (
+            <MonthlyPaymentWidget paidThisMonth={paidThisMonth} target={debtTarget} />
           )}
+          <SavingsWidget
+            summary={savingsSummary}
+            planStartDate={planStartDate}
+            bundle={projection}
+          />
+          {!debtFree && (
+            <MilestoneWidget title={milestone.title} description={milestone.description} />
+          )}
+          <FitnessWeekWidget summary={fitnessSummary} />
+          <BusinessWeekWidget stats={businessStats} followUps={followUps} />
         </div>
-        <div className="lg:col-span-2">
-          <HabitsStrip habits={habits} />
-        </div>
-        {debtFree ? (
-          <MilestoneWidget title={milestone.title} description={milestone.description} />
-        ) : (
-          <MonthlyPaymentWidget paidThisMonth={paidThisMonth} target={debtTarget} />
-        )}
-        <SavingsWidget
-          summary={savingsSummary}
-          planStartDate={planStartDate}
-          bundle={projection}
-        />
-        {!debtFree && <MilestoneWidget title={milestone.title} description={milestone.description} />}
-        <FitnessWeekWidget summary={fitnessSummary} />
-        <BusinessWeekWidget stats={businessStats} />
-        <ReviewReminderWidget isDue={reviewDue} />
-      </div>
+      </DashboardSundayOrder>
     </AppShell>
   );
 }

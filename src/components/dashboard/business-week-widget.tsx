@@ -3,16 +3,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
-import type { BusinessWeekStats } from "@/lib/types";
+import type { BusinessWeekStats, FollowUpItem } from "@/lib/types";
 
-export function BusinessWeekWidget({ stats }: { stats: BusinessWeekStats }) {
+export function BusinessWeekWidget({
+  stats,
+  followUps,
+}: {
+  stats: BusinessWeekStats;
+  followUps: FollowUpItem[];
+}) {
+  const dueCount = followUps.filter((item) => item.overdue || item.daysUntilDue <= 0).length;
+
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
         <CardTitle>Business This Week</CardTitle>
-        <Badge variant={stats.closes > 0 ? "success" : "default"}>
-          {stats.leads}/{stats.closes}
-        </Badge>
+        <div className="flex gap-2">
+          {dueCount > 0 && (
+            <Badge variant={followUps.some((item) => item.overdue) ? "danger" : "warning"}>
+              {dueCount} follow-up{dueCount === 1 ? "" : "s"}
+            </Badge>
+          )}
+          <Badge variant={stats.closes > 0 ? "success" : "default"}>
+            {stats.leads}/{stats.closes}
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         <p className="text-2xl font-semibold">
@@ -24,7 +39,7 @@ export function BusinessWeekWidget({ stats }: { stats: BusinessWeekStats }) {
         </p>
         <Link href="/business">
           <Button variant="outline" size="sm" className="w-full">
-            Log a lead
+            {dueCount > 0 ? "View follow-ups" : "Log a lead"}
           </Button>
         </Link>
       </CardContent>

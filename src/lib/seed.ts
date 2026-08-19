@@ -6,6 +6,7 @@ export const DEBT_ACCOUNTS_SEED = [
     initial_balance: 409.93,
     interest_rate: 27,
     min_payment: 25,
+    due_day_of_month: 15,
     priority: 1,
   },
   {
@@ -13,6 +14,7 @@ export const DEBT_ACCOUNTS_SEED = [
     initial_balance: 514.16,
     interest_rate: null,
     min_payment: 25,
+    due_day_of_month: 15,
     priority: 2,
   },
   {
@@ -20,6 +22,7 @@ export const DEBT_ACCOUNTS_SEED = [
     initial_balance: 1458.81,
     interest_rate: 27,
     min_payment: 35,
+    due_day_of_month: 15,
     priority: 3,
   },
   {
@@ -27,6 +30,7 @@ export const DEBT_ACCOUNTS_SEED = [
     initial_balance: 5648.04,
     interest_rate: 27,
     min_payment: 113,
+    due_day_of_month: 15,
     priority: 4,
   },
   {
@@ -34,6 +38,7 @@ export const DEBT_ACCOUNTS_SEED = [
     initial_balance: 13815.11,
     interest_rate: 7.99,
     min_payment: 296,
+    due_day_of_month: 15,
     priority: 5,
   },
 ] as const;

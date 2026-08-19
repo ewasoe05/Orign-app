@@ -99,6 +99,7 @@ export async function seedUserData(userId: string) {
             current_balance: account.initial_balance,
             interest_rate: account.interest_rate,
             min_payment: account.min_payment,
+            due_day_of_month: account.due_day_of_month,
             priority: account.priority,
             is_paid_off: false,
           })),
