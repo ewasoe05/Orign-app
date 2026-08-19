@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Panel } from "@/components/ui/panel";
 import { QUARTERLY_PLAN } from "@/content/plan";
 
 export function OnePageTable({ currentQuarter }: { currentQuarter: number }) {
@@ -10,28 +11,24 @@ export function OnePageTable({ currentQuarter }: { currentQuarter: number }) {
       </CardHeader>
       <CardContent className="space-y-3">
         {QUARTERLY_PLAN.map((q) => (
-          <div
+          <Panel
             key={q.quarter}
-            className={`rounded-lg border p-3 ${
-              q.quarter === currentQuarter
-                ? "border-emerald-800 bg-emerald-950/20"
-                : "border-zinc-800"
-            }`}
+            className={q.quarter === currentQuarter ? "border-accent/40 bg-success-bg/50" : undefined}
           >
             <div className="mb-2 flex items-center gap-2">
-              <p className="text-sm font-medium">{q.label}</p>
+              <p className="text-body font-medium">{q.label}</p>
               {q.quarter === currentQuarter && <Badge variant="success">Now</Badge>}
             </div>
-            <p className="text-xs text-zinc-400">
-              <span className="text-zinc-300">Money:</span> {q.money}
+            <p className="text-caption text-text-secondary">
+              <span className="text-text-primary">Money:</span> {q.money}
             </p>
-            <p className="mt-1 text-xs text-zinc-400">
-              <span className="text-zinc-300">Business:</span> {q.business}
+            <p className="mt-1 text-caption text-text-secondary">
+              <span className="text-text-primary">Business:</span> {q.business}
             </p>
-            <p className="mt-1 text-xs text-zinc-400">
-              <span className="text-zinc-300">Body:</span> {q.body}
+            <p className="mt-1 text-caption text-text-secondary">
+              <span className="text-text-primary">Body:</span> {q.body}
             </p>
-          </div>
+          </Panel>
         ))}
       </CardContent>
     </Card>

@@ -2,12 +2,12 @@
 
 import { useActionState } from "react";
 import { savePlanFacts } from "@/lib/actions/plan";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
 import type { PlanFacts } from "@/lib/types";
 
 export function PlanFactsForm({
@@ -90,11 +90,11 @@ export function PlanFactsForm({
               placeholder="e.g. 1.5"
             />
           </div>
-          {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
-          {state?.success && <p className="text-sm text-emerald-400">Saved.</p>}
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Saving..." : "Save answers"}
-          </Button>
+          {state?.error && <p className="text-caption text-danger">{state.error}</p>}
+          {state?.success && <p className="text-caption text-accent-muted">Saved.</p>}
+          <FormActions>
+            <FormSubmit loading={pending}>Save answers</FormSubmit>
+          </FormActions>
         </form>
       </CardContent>
     </Card>

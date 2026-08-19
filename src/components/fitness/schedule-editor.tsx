@@ -2,11 +2,11 @@
 
 import { useActionState, useState } from "react";
 import { saveWeeklySchedule } from "@/lib/actions/fitness";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Panel } from "@/components/ui/panel";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
 import { DAY_LABELS } from "@/lib/seed";
 import type { WeeklyScheduleDay, WorkoutTemplateWithExercises } from "@/lib/types";
 
@@ -72,11 +72,11 @@ export function ScheduleEditor({
       <CardContent>
         <form action={action} className="space-y-3">
           {days.map((day, index) => (
-            <div
+            <Panel
               key={day.day_of_week}
-              className="grid grid-cols-1 items-center gap-2 rounded-lg border border-zinc-800 p-2 sm:grid-cols-[3rem_1fr_1fr]"
+              className="grid grid-cols-1 items-center gap-2 sm:grid-cols-[3rem_1fr_1fr]"
             >
-              <span className="text-sm font-medium text-zinc-400">{DAY_LABELS[index]}</span>
+              <span className="text-body font-medium text-text-secondary">{DAY_LABELS[index]}</span>
               <Select
                 value={day.schedule_type}
                 onChange={(e) => updateDay(index, "schedule_type", e.target.value)}
@@ -105,15 +105,15 @@ export function ScheduleEditor({
                   placeholder="Label"
                 />
               )}
-            </div>
+            </Panel>
           ))}
 
-          {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
-          {state?.success && <p className="text-sm text-emerald-400">Schedule saved!</p>}
+          {state?.error && <p className="text-caption text-danger">{state.error}</p>}
+          {state?.success && <p className="text-caption text-accent-muted">Schedule saved!</p>}
 
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Saving..." : "Save schedule"}
-          </Button>
+          <FormActions>
+            <FormSubmit loading={pending}>Save schedule</FormSubmit>
+          </FormActions>
         </form>
       </CardContent>
     </Card>

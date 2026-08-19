@@ -2,11 +2,12 @@
 
 import { useActionState } from "react";
 import { submitQuarterlyReview } from "@/lib/actions/quarterly";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Panel } from "@/components/ui/panel";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
 import { QUARTERLY_PLAN } from "@/content/plan";
 import { formatLocalDate } from "@/lib/utils";
 
@@ -41,17 +42,17 @@ export function QuarterlyForm({ currentQuarter }: { currentQuarter: number }) {
           </div>
           <input type="hidden" name="review_date" value={formatLocalDate()} />
 
-          <div className="rounded-lg border border-zinc-800 p-3 text-sm text-zinc-400">
+          <Panel className="text-body text-text-secondary">
             <p>
-              <span className="text-zinc-300">Money:</span> {plan.money}
+              <span className="text-text-primary">Money:</span> {plan.money}
             </p>
             <p className="mt-1">
-              <span className="text-zinc-300">Business:</span> {plan.business}
+              <span className="text-text-primary">Business:</span> {plan.business}
             </p>
             <p className="mt-1">
-              <span className="text-zinc-300">Body:</span> {plan.body}
+              <span className="text-text-primary">Body:</span> {plan.body}
             </p>
-          </div>
+          </Panel>
 
           <StatusSelect name="money_status" label="Money" />
           <StatusSelect name="business_status" label="Business" />
@@ -66,13 +67,13 @@ export function QuarterlyForm({ currentQuarter }: { currentQuarter: number }) {
             <Textarea id="what_to_adjust" name="what_to_adjust" rows={3} required />
           </div>
 
-          {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
+          {state?.error && <p className="text-caption text-danger">{state.error}</p>}
           {state?.success && (
-            <p className="text-sm text-emerald-400">Checkpoint saved. Keep running the plan.</p>
+            <p className="text-caption text-accent-muted">Checkpoint saved. Keep running the plan.</p>
           )}
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Saving..." : "Save checkpoint"}
-          </Button>
+          <FormActions>
+            <FormSubmit loading={pending}>Save checkpoint</FormSubmit>
+          </FormActions>
         </form>
       </CardContent>
     </Card>

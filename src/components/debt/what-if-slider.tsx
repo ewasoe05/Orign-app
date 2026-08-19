@@ -38,25 +38,25 @@ export function WhatIfSlider({
           step={50}
           value={outlay}
           onChange={(event) => setOutlay(Number(event.target.value))}
-          className="w-full accent-emerald-500"
+          className="w-full accent-accent"
         />
-        <p className="text-sm text-zinc-300">{formatCurrencyDetailed(outlay)} / month</p>
-        <div className="grid grid-cols-1 gap-2 text-sm">
+        <p className="text-body text-text-primary">{formatCurrencyDetailed(outlay)} / month</p>
+        <div className="grid grid-cols-1 gap-2 text-body">
           <p>
-            <span className="text-zinc-500">Debt-free:</span>{" "}
+            <span className="text-text-tertiary">Debt-free:</span>{" "}
             <span className="font-medium">{summary.debtFreeLabel ?? "—"}</span>
           </p>
           <p>
-            <span className="text-zinc-500">Duplex cash ready:</span>{" "}
+            <span className="text-text-tertiary">Duplex cash ready:</span>{" "}
             <span className="font-medium">{summary.closingLabel ?? "—"}</span>
           </p>
           <p>
-            <span className="text-zinc-500">Total interest:</span>{" "}
+            <span className="text-text-tertiary">Total interest:</span>{" "}
             <span className="font-medium">{formatCurrencyDetailed(summary.totalInterest)}</span>
           </p>
         </div>
         {!summary.feasible && (
-          <p className="text-xs text-amber-400">This outlay cannot cover minimums plus interest.</p>
+          <p className="text-caption text-warning">This outlay cannot cover minimums plus interest.</p>
         )}
       </CardContent>
     </Card>

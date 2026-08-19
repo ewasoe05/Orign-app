@@ -17,24 +17,24 @@ export function InterestPanel({ bundle }: { bundle: UserProjectionBundle }) {
       <CardHeader>
         <CardTitle>Interest</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm">
+      <CardContent className="space-y-3 text-body">
         <div className="flex items-center justify-between">
-          <span className="text-zinc-400">Paid to date (estimated)</span>
+          <span className="text-text-secondary">Paid to date (estimated)</span>
           <span className="font-medium">{formatCurrencyDetailed(paid)}</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-zinc-400">Projected remaining</span>
+          <span className="text-text-secondary">Projected remaining</span>
           <span className="font-medium">{formatCurrencyDetailed(remaining)}</span>
         </div>
         <div className="flex items-center justify-between gap-3">
-          <span className="text-zinc-400">Saved vs minimums-only</span>
+          <span className="text-text-secondary">Saved vs minimums-only</span>
           {saved != null ? (
-            <span className="font-medium text-emerald-400">{formatCurrencyDetailed(saved)}</span>
+            <span className="font-medium text-accent-muted">{formatCurrencyDetailed(saved)}</span>
           ) : (
             <Badge>Minimums-only: {bundle.interest.minimumsOnlyLabel}</Badge>
           )}
         </div>
-        <p className="text-xs text-zinc-500">
+        <p className="text-caption text-text-tertiary">
           Monthly outlay driving this plan: {formatCurrencyDetailed(centsToDollars(bundle.monthlyOutlayCents))}
         </p>
       </CardContent>

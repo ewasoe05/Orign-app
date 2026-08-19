@@ -29,13 +29,13 @@ export function ReviewCounter({ count }: { count: number }) {
           {count}/{GOOGLE_REVIEW_TARGET}
         </p>
         <Progress value={progress} />
-        <p className="text-xs text-zinc-500">Target 20 by December 2026.</p>
+        <p className="text-caption text-text-tertiary">Target 20 by December 2026.</p>
         <form action={action} className="space-y-2">
           <Label htmlFor="review_date">Log a review</Label>
           <Input id="review_date" name="review_date" type="date" defaultValue={formatLocalDate()} />
           <Input name="notes" placeholder="Customer / job (optional)" />
-          {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
-          {state?.success && <p className="text-sm text-emerald-400">Review counted.</p>}
+          {state?.error && <p className="text-caption text-danger">{state.error}</p>}
+          {state?.success && <p className="text-caption text-accent-muted">Review counted.</p>}
           <Button type="submit" variant="outline" className="w-full" disabled={pending}>
             {pending ? "Saving..." : "Add review"}
           </Button>

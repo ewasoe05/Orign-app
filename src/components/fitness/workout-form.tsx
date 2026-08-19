@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
 import {
   DynamicExerciseForm,
   exercisesFromTemplate,
@@ -178,23 +179,27 @@ export function WorkoutForm({
             </div>
           )}
 
-          {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
+          {state?.error && <p className="text-caption text-danger">{state.error}</p>}
           {state?.success && (
-            <p className="text-sm text-emerald-400">
+            <p className="text-caption text-accent-muted">
               {isEditing ? "Workout updated!" : "Workout logged!"}
             </p>
           )}
 
-          <div className="flex gap-2">
-            <Button type="submit" className="flex-1" disabled={pending}>
-              {pending ? "Saving..." : isEditing ? "Update workout" : "Log workout"}
-            </Button>
-            {isEditing && onEditComplete && (
-              <Button type="button" variant="outline" onClick={onEditComplete}>
-                Cancel
-              </Button>
-            )}
-          </div>
+          <FormActions
+            className={isEditing && onEditComplete ? "flex-row gap-2 pt-0" : undefined}
+            secondary={
+              isEditing && onEditComplete ? (
+                <Button type="button" variant="outline" className="flex-1" onClick={onEditComplete}>
+                  Cancel
+                </Button>
+              ) : undefined
+            }
+          >
+            <FormSubmit className={isEditing && onEditComplete ? "flex-1" : undefined} loading={pending}>
+              {isEditing ? "Update workout" : "Log workout"}
+            </FormSubmit>
+          </FormActions>
         </form>
       </CardContent>
     </Card>
@@ -205,17 +210,17 @@ export function FloorHabitButton() {
   const [state, action, pending] = useActionState(async () => logFloorHabit(), null);
 
   return (
-    <Card className="border-amber-900/50">
+    <Card className="border-warning/50">
       <CardHeader>
         <CardTitle>Bad Day? Hit the Floor</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="mb-3 text-sm text-zinc-400">
+        <p className="mb-3 text-body text-text-secondary">
           10-minute walk counts. Never go to zero — that&apos;s where the spiral starts.
         </p>
         <form action={action}>
-          {state?.success && <p className="mb-2 text-sm text-emerald-400">Floor habit logged!</p>}
-          {state?.error && <p className="mb-2 text-sm text-red-400">{state.error}</p>}
+          {state?.success && <p className="mb-2 text-caption text-accent-muted">Floor habit logged!</p>}
+          {state?.error && <p className="mb-2 text-caption text-danger">{state.error}</p>}
           <Button type="submit" variant="secondary" className="w-full" disabled={pending}>
             {pending ? "Saving..." : "Hit floor today"}
           </Button>

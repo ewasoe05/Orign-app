@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Panel } from "@/components/ui/panel";
 import { Plus, Trash2 } from "lucide-react";
 import type { LastLift, TemplateExercise } from "@/lib/types";
 
@@ -36,22 +35,22 @@ export function DynamicExerciseForm({ exercises, onChange, lastLifts }: DynamicE
   };
 
   return (
-    <div className="space-y-3 rounded-lg border border-zinc-800 p-3">
+    <Panel className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-zinc-300">Exercises</p>
+        <p className="text-body font-medium text-text-primary">Exercises</p>
         <Button type="button" variant="outline" size="sm" onClick={addRow}>
           <Plus className="mr-1 h-3 w-3" /> Add
         </Button>
       </div>
 
       {exercises.length === 0 && (
-        <p className="text-xs text-zinc-500">No exercises added. Click Add or select a template.</p>
+        <p className="text-caption text-text-tertiary">No exercises added. Click Add or select a template.</p>
       )}
 
       {exercises.map((row, index) => {
         const last = lastLifts?.[row.name];
         return (
-          <div key={index} className="space-y-1 rounded-lg border border-zinc-800/50 p-2">
+          <Panel key={index} className="space-y-1 p-2">
             <div className="flex items-center gap-2">
               <Input
                 placeholder="Exercise name"
@@ -60,7 +59,7 @@ export function DynamicExerciseForm({ exercises, onChange, lastLifts }: DynamicE
                 className="flex-1"
               />
               <Button type="button" variant="ghost" size="icon" onClick={() => removeRow(index)}>
-                <Trash2 className="h-4 w-4 text-red-400" />
+                <Trash2 className="h-4 w-4 text-danger" />
               </Button>
             </div>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -88,14 +87,14 @@ export function DynamicExerciseForm({ exercises, onChange, lastLifts }: DynamicE
               />
             </div>
             {last && (
-              <p className="text-xs text-zinc-500">
+              <p className="text-caption text-text-tertiary">
                 Last: {last.weight} lbs × {last.reps} × {last.sets}
               </p>
             )}
-          </div>
+          </Panel>
         );
       })}
-    </div>
+    </Panel>
   );
 }
 

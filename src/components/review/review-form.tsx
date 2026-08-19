@@ -2,11 +2,11 @@
 
 import { useActionState } from "react";
 import { submitReview } from "@/lib/actions/review";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
 import { WEEKLY_REVIEW_QUESTIONS } from "@/content/plan";
 
 export function ReviewForm({
@@ -65,14 +65,14 @@ export function ReviewForm({
             </div>
           ))}
 
-          {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
+          {state?.error && <p className="text-caption text-danger">{state.error}</p>}
           {state?.success && (
-            <p className="text-sm text-emerald-400">Review saved. See you next Sunday.</p>
+            <p className="text-caption text-accent-muted">Review saved. See you next Sunday.</p>
           )}
 
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Saving..." : "Save review"}
-          </Button>
+          <FormActions>
+            <FormSubmit loading={pending}>Save review</FormSubmit>
+          </FormActions>
         </form>
       </CardContent>
     </Card>

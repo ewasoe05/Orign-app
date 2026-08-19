@@ -5,6 +5,7 @@ import { setHabitLevel } from "@/lib/actions/habits";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Panel } from "@/components/ui/panel";
 import { formatCurrency } from "@/lib/utils";
 import type { FollowUpItem } from "@/lib/types";
 
@@ -35,19 +36,19 @@ export function FollowUpQueue({ items }: { items: FollowUpItem[] }) {
       </CardHeader>
       <CardContent className="space-y-2">
         {items.length === 0 ? (
-          <p className="text-sm text-zinc-400">No open quotes. Day 2 / 7 / 21 stays empty until you log a lead.</p>
+          <p className="text-body text-text-secondary">No open quotes. Day 2 / 7 / 21 stays empty until you log a lead.</p>
         ) : (
           items.map((item) => (
-            <div
+            <Panel
               key={`${item.lead.id}-${item.followUpDay}`}
-              className="flex items-start justify-between gap-2 rounded-lg border border-zinc-800 p-3"
+              className="flex items-start justify-between gap-2"
             >
               <div>
-                <p className="text-sm font-medium">{item.lead.service}</p>
-                <p className="text-xs text-zinc-500">
+                <p className="text-body font-medium">{item.lead.service}</p>
+                <p className="text-caption text-text-tertiary">
                   {item.lead.source} · quoted {formatCurrency(Number(item.lead.quoted_amount))}
                 </p>
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-caption text-text-secondary">
                   Day {item.followUpDay} follow-up · due {item.dueDate}
                 </p>
               </div>
@@ -57,7 +58,7 @@ export function FollowUpQueue({ items }: { items: FollowUpItem[] }) {
                 </Badge>
                 <MarkSentButton />
               </div>
-            </div>
+            </Panel>
           ))
         )}
       </CardContent>

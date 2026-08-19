@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Panel } from "@/components/ui/panel";
+import { cn } from "@/lib/utils";
 import { DAY_LABELS } from "@/lib/seed";
 import type { WeeklyScheduleDay } from "@/lib/types";
 import { addDaysIso, formatLocalDate, getWeekStartDate } from "@/lib/utils";
@@ -31,19 +33,19 @@ export function WeekCalendar({
           const isRest = daySchedule?.schedule_type === "rest" || !daySchedule;
           const isFloor = workout?.workout_type === "floor" || floorDates.includes(date);
 
-          let borderClass = "border-zinc-800";
-          if (isToday) borderClass = "border-emerald-800 bg-emerald-950/20";
-          else if (workout && !isFloor) borderClass = "border-emerald-900/50 bg-emerald-950/10";
-          else if (isFloor) borderClass = "border-amber-900/50 bg-amber-950/10";
+          let panelClass: string | undefined;
+          if (isToday) panelClass = "border-accent/40 bg-success-bg/50";
+          else if (workout && !isFloor) panelClass = "border-accent/30 bg-success-bg/30";
+          else if (isFloor) panelClass = "border-warning/50 bg-warning/10";
 
           return (
-            <div key={date} className={`flex items-center justify-between rounded-lg border p-3 ${borderClass}`}>
+            <Panel key={date} className={cn("flex items-center justify-between", panelClass)}>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">{DAY_LABELS[i]}</span>
+                  <span className="text-body font-medium">{DAY_LABELS[i]}</span>
                   {isToday && <Badge variant="success">Today</Badge>}
                 </div>
-                <p className="text-xs text-zinc-400">
+                <p className="text-caption text-text-secondary">
                   {daySchedule?.label ?? "Rest"}
                 </p>
               </div>
@@ -56,7 +58,7 @@ export function WeekCalendar({
               ) : (
                 <Badge>Planned</Badge>
               )}
-            </div>
+            </Panel>
           );
         })}
       </CardContent>

@@ -19,20 +19,20 @@ export function VolumeSparkline({
             const label = week.weekStart.slice(5);
             return (
               <div key={week.weekStart} className="flex flex-1 flex-col items-center gap-1">
-                <span className="text-[10px] text-zinc-500">
+                <span className="text-caption text-text-tertiary">
                   {week.tonnage > 0 ? `${(week.tonnage / 1000).toFixed(1)}k` : "—"}
                 </span>
                 <div
-                  className="w-full rounded-sm bg-emerald-600/70"
+                  className="w-full rounded-sm bg-accent-muted"
                   style={{ height: `${height}px` }}
                   title={`Week of ${week.weekStart}: ${week.tonnage.toLocaleString()} lbs`}
                 />
-                <span className="text-[10px] text-zinc-500">{label}</span>
+                <span className="text-caption text-text-tertiary">{label}</span>
               </div>
             );
           })}
         </div>
-        <p className="mt-2 text-xs text-zinc-500">Tonnage = sets × reps × weight (last 4 weeks)</p>
+        <p className="mt-2 text-caption text-text-tertiary">Tonnage = sets × reps × weight (last 4 weeks)</p>
       </CardContent>
     </Card>
   );
