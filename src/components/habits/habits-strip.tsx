@@ -10,11 +10,11 @@ import { cn } from "@/lib/utils";
 import type { HabitFloorStatus, HabitLevel, HabitWeekDot } from "@/lib/types";
 
 const DOT_CLASS: Record<HabitWeekDot["status"], string> = {
-  full: "bg-emerald-500",
-  floor: "border border-amber-400 bg-transparent",
-  miss: "bg-zinc-900 border border-zinc-800",
-  unmarked: "bg-zinc-800",
-  future: "bg-zinc-900/40",
+  full: "bg-accent-muted",
+  floor: "border border-warning bg-transparent",
+  miss: "border border-border-subtle bg-surface",
+  unmarked: "bg-border-subtle",
+  future: "bg-surface-inset/40",
 };
 
 function LevelButton({
@@ -45,13 +45,13 @@ function LevelButton({
         variant="outline"
         disabled={pending}
         className={cn(
-          "h-10 w-full text-xs",
+          "h-10 w-full text-caption",
           active &&
             (level === "full"
-              ? "border-emerald-700 bg-emerald-950 text-emerald-300 hover:bg-emerald-950"
+              ? "border-accent bg-success-bg text-accent-muted hover:bg-success-bg"
               : level === "floor"
-                ? "border-amber-700 bg-amber-950 text-amber-300 hover:bg-amber-950"
-                : "border-zinc-600 bg-zinc-800 text-zinc-200 hover:bg-zinc-800"),
+                ? "border-warning bg-warning/10 text-warning hover:bg-warning/10"
+                : "border-border-strong bg-surface-raised text-text-primary hover:bg-surface-raised"),
         )}
       >
         {label}
@@ -66,14 +66,14 @@ function HabitCard({ habit }: { habit: HabitFloorStatus }) {
       className={cn(
         "rounded-lg border p-3",
         habit.neverMissTwice
-          ? "border-amber-700 bg-amber-950/40"
+          ? "border-warning bg-warning/10"
           : habit.hitToday
-            ? "border-emerald-800 bg-emerald-950/30"
-            : "border-zinc-800 bg-zinc-950/40",
+            ? "border-accent-muted bg-success-bg"
+            : "border-border-subtle bg-surface-inset",
       )}
     >
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-medium">{habit.name}</p>
+        <p className="text-body font-medium">{habit.name}</p>
         {habit.neverMissTwice ? (
           <Badge variant="warning">
             <span title="Don't miss twice — today matters">Miss twice risk</span>
@@ -86,16 +86,16 @@ function HabitCard({ habit }: { habit: HabitFloorStatus }) {
           <Badge>Miss</Badge>
         ) : null}
       </div>
-      <p className="mb-2 text-xs text-zinc-400">{habit.description}</p>
+      <p className="mb-2 text-caption text-text-secondary">{habit.description}</p>
       <div className="mb-2 flex justify-between">
         {habit.weekDots.map((dot) => (
           <div key={dot.date} className="flex flex-col items-center gap-1">
             <div className={cn("h-3 w-3 rounded-full", DOT_CLASS[dot.status])} />
-            <span className="text-[10px] text-zinc-500">{dot.label[0]}</span>
+            <span className="text-[10px] text-text-tertiary">{dot.label[0]}</span>
           </div>
         ))}
       </div>
-      <p className="mb-2 text-xs text-zinc-500">{habit.streak} day streak</p>
+      <p className="mb-2 text-caption text-text-tertiary">{habit.streak} day streak</p>
       <div className="grid grid-cols-3 gap-2">
         <LevelButton habitKey={habit.key} level="full" label="Full" active={habit.todayLevel === "full"} />
         <LevelButton habitKey={habit.key} level="floor" label="Floor" active={habit.todayLevel === "floor"} />
@@ -109,11 +109,12 @@ export function HabitsStrip({ habits }: { habits: HabitFloorStatus[] }) {
   const warningCount = habits.filter((habit) => habit.neverMissTwice).length;
 
   return (
-    <Card className={warningCount > 0 ? "border-amber-900/50" : undefined}>
+    <Card className={warningCount > 0 ? "border-warning/50" : undefined}>
       <CardHeader>
-        <CardHeaderRow>
+        <CardHeaderRow
+          action={warningCount > 0 ? <Badge variant="warning">Never miss twice</Badge> : undefined}
+        >
           <CardTitle>Habit Floors</CardTitle>
-          {warningCount > 0 && <Badge variant="warning">Never miss twice</Badge>}
         </CardHeaderRow>
       </CardHeader>
       <CardContent>

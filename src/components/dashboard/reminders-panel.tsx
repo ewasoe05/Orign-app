@@ -5,6 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import { dismissReminder } from "@/lib/actions/reminders";
 import { buildReminders, sortRemindersForDashboard } from "@/lib/reminders";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Panel } from "@/components/ui/panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { RemindersContext } from "@/lib/types";
@@ -54,13 +55,13 @@ export function RemindersPanel({ context }: { context: RemindersContext }) {
       </CardHeader>
       <CardContent className="space-y-3">
         {reminders.map((reminder) => (
-          <div
+          <Panel
             key={`${reminder.key}:${reminder.scope}`}
-            className="flex flex-col gap-2 rounded-lg border border-zinc-800 p-3 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-zinc-100">{reminder.title}</p>
+                <p className="text-body font-medium text-text-primary">{reminder.title}</p>
                 <Badge variant={urgencyVariant[reminder.urgency]}>
                   {reminder.urgency === "danger"
                     ? "Urgent"
@@ -69,7 +70,7 @@ export function RemindersPanel({ context }: { context: RemindersContext }) {
                       : "Done"}
                 </Badge>
               </div>
-              <p className="text-sm text-zinc-400">{reminder.message}</p>
+              <p className="text-body text-text-secondary">{reminder.message}</p>
             </div>
             <div className="flex gap-2">
               {reminder.href && (
@@ -90,7 +91,7 @@ export function RemindersPanel({ context }: { context: RemindersContext }) {
                 </Button>
               )}
             </div>
-          </div>
+          </Panel>
         ))}
       </CardContent>
     </Card>

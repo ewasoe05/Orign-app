@@ -13,8 +13,8 @@ export function MilestoneWidget({
         <CardTitle>Next Milestone</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="font-medium text-emerald-400">{title}</p>
-        <p className="mt-1 text-sm text-zinc-400">{description}</p>
+        <p className="text-body font-medium text-text-primary">{title}</p>
+        <p className="mt-1 text-caption text-text-secondary">{description}</p>
       </CardContent>
     </Card>
   );

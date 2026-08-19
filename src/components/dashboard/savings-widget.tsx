@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
+import { Metric } from "@/components/ui/metric";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -33,24 +35,25 @@ export function SavingsWidget({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <CardHeaderRow
+          action={
+            pace ? <Badge variant={paceBadgeVariant(pace.status)}>{pace.label}</Badge> : undefined
+          }
+        >
           <CardTitle>Toward Down Payment</CardTitle>
-          {pace && <Badge variant={paceBadgeVariant(pace.status)}>{pace.label}</Badge>}
-        </div>
+        </CardHeaderRow>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex items-baseline justify-between">
-          <span className="text-2xl font-semibold text-emerald-400">
-            {formatCurrency(summary.cashOnHand)}
-          </span>
-          <span className="text-sm text-zinc-400">
+          <Metric variant="widget">{formatCurrency(summary.cashOnHand)}</Metric>
+          <span className="text-caption text-text-secondary">
             of {formatCurrency(summary.downPaymentTarget)}
           </span>
         </div>
         <Progress value={summary.progress} />
-        {pace && <p className="text-sm text-zinc-400">{pace.subline}</p>}
+        {pace && <p className="text-caption text-text-secondary">{pace.subline}</p>}
         {summary.nextMilestone && (
-          <p className="text-sm text-zinc-400">
+          <p className="text-caption text-text-secondary">
             Next: {summary.nextMilestone.description} ({summary.nextMilestone.label})
           </p>
         )}

@@ -1,4 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
+import { Metric } from "@/components/ui/metric";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyDetailed } from "@/lib/utils";
 import { sortAccountsByPayoffOrder } from "@/lib/debt-priority";
@@ -14,26 +16,33 @@ export function AccountCards({ accounts }: { accounts: DebtAccount[] }) {
           key={account.id}
           className={account.is_paid_off ? "opacity-60" : ""}
         >
-          <CardHeader className="flex-row items-start justify-between">
-            <div>
-              <CardTitle className="text-sm">{account.name}</CardTitle>
-              {account.interest_rate != null ? (
-                <p className="text-xs text-zinc-500">{account.interest_rate}% APR</p>
-              ) : (
-                <p className="text-xs text-amber-400">Set APR — projection assumes 0% until you log it</p>
-              )}
-            </div>
-            {account.is_paid_off ? (
-              <Badge variant="success">Paid off</Badge>
-            ) : (
-              <Badge>Priority {account.priority}</Badge>
-            )}
+          <CardHeader>
+            <CardHeaderRow
+              action={
+                account.is_paid_off ? (
+                  <Badge variant="success">Paid off</Badge>
+                ) : (
+                  <Badge>Priority {account.priority}</Badge>
+                )
+              }
+            >
+              <div>
+                <CardTitle>{account.name}</CardTitle>
+                {account.interest_rate != null ? (
+                  <p className="text-caption text-text-tertiary">{account.interest_rate}% APR</p>
+                ) : (
+                  <p className="text-caption text-warning">
+                    Set APR — projection assumes 0% until you log it
+                  </p>
+                )}
+              </div>
+            </CardHeaderRow>
           </CardHeader>
           <CardContent>
-            <p className="text-xl font-semibold">
+            <Metric variant="compact">
               {formatCurrencyDetailed(Number(account.current_balance))}
-            </p>
-            <p className="text-xs text-zinc-500">
+            </Metric>
+            <p className="text-caption text-text-tertiary">
               Started at {formatCurrencyDetailed(Number(account.initial_balance))}
             </p>
           </CardContent>

@@ -7,6 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
+import { Panel } from "@/components/ui/panel";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import type { WorkoutTemplateWithExercises } from "@/lib/types";
@@ -83,24 +86,26 @@ export function TemplateManager({ templates }: { templates: WorkoutTemplateWithE
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between">
-        <CardTitle>Workout Templates</CardTitle>
-        {!isFormOpen && (
-          <Button variant="outline" size="sm" onClick={startCreate}>
-            <Plus className="mr-1 h-3 w-3" /> New
-          </Button>
-        )}
+      <CardHeader>
+        <CardHeaderRow
+          action={
+            !isFormOpen ? (
+              <Button variant="outline" size="sm" onClick={startCreate}>
+                <Plus className="mr-1 h-3 w-3" /> New
+              </Button>
+            ) : undefined
+          }
+        >
+          <CardTitle>Workout Templates</CardTitle>
+        </CardHeaderRow>
       </CardHeader>
       <CardContent className="space-y-3">
         {!isFormOpen &&
           templates.map((template) => (
-            <div
-              key={template.id}
-              className="flex items-center justify-between rounded-lg border border-zinc-800 p-3"
-            >
+            <Panel key={template.id} className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">{template.name}</p>
-                <p className="text-xs text-zinc-500">
+                <p className="text-body font-medium">{template.name}</p>
+                <p className="text-caption text-text-tertiary">
                   {template.exercises.length} exercises · {template.workout_type}
                 </p>
               </div>
@@ -113,99 +118,102 @@ export function TemplateManager({ templates }: { templates: WorkoutTemplateWithE
                   <form action={deleteAction}>
                     <input type="hidden" name="template_id" value={template.id} />
                     <Button variant="ghost" size="icon" type="submit">
-                      <Trash2 className="h-4 w-4 text-red-400" />
+                      <Trash2 className="h-4 w-4 text-danger" />
                     </Button>
                   </form>
                 )}
               </div>
-            </div>
+            </Panel>
           ))}
 
         {isFormOpen && (
-          <form action={saveAction} className="space-y-3 rounded-lg border border-zinc-700 p-3">
-            {editing && <input type="hidden" name="template_id" value={editing} />}
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <div className="space-y-1">
-                <Label>Name</Label>
-                <Input name="name" value={name} onChange={(e) => setName(e.target.value)} required />
-              </div>
-              <div className="space-y-1">
-                <Label>Type</Label>
-                <Select
-                  name="workout_type"
-                  value={workoutType}
-                  onChange={(e) => setWorkoutType(e.target.value)}
-                >
-                  <option value="lift">Lift</option>
-                  <option value="run">Run</option>
-                  <option value="walk">Walk</option>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label>Exercises</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setExercises([...exercises, { name: "", sets: "3", reps: "8" }])}
-                >
-                  <Plus className="mr-1 h-3 w-3" /> Add
-                </Button>
-              </div>
-              {exercises.map((exercise, i) => (
-                <div key={i} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  <Input
-                    placeholder="Exercise"
-                    value={exercise.name}
-                    onChange={(e) => {
-                      const updated = [...exercises];
-                      updated[i].name = e.target.value;
-                      setExercises(updated);
-                    }}
-                    className="col-span-2 min-w-0"
-                  />
-                  <Input
-                    placeholder="Sets"
-                    type="number"
-                    value={exercise.sets}
-                    onChange={(e) => {
-                      const updated = [...exercises];
-                      updated[i].sets = e.target.value;
-                      setExercises(updated);
-                    }}
-                  />
-                  <Input
-                    placeholder="Reps"
-                    type="number"
-                    value={exercise.reps}
-                    onChange={(e) => {
-                      const updated = [...exercises];
-                      updated[i].reps = e.target.value;
-                      setExercises(updated);
-                    }}
-                  />
+          <Panel className="space-y-3 border-border-strong">
+            <form action={saveAction} className="space-y-3">
+              {editing && <input type="hidden" name="template_id" value={editing} />}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="space-y-1">
+                  <Label>Name</Label>
+                  <Input name="name" value={name} onChange={(e) => setName(e.target.value)} required />
                 </div>
-              ))}
-            </div>
+                <div className="space-y-1">
+                  <Label>Type</Label>
+                  <Select
+                    name="workout_type"
+                    value={workoutType}
+                    onChange={(e) => setWorkoutType(e.target.value)}
+                  >
+                    <option value="lift">Lift</option>
+                    <option value="run">Run</option>
+                    <option value="walk">Walk</option>
+                  </Select>
+                </div>
+              </div>
 
-            {saveState?.error && <p className="text-sm text-red-400">{saveState.error}</p>}
-            {saveState?.success && <p className="text-sm text-emerald-400">Template saved!</p>}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Exercises</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setExercises([...exercises, { name: "", sets: "3", reps: "8" }])}
+                  >
+                    <Plus className="mr-1 h-3 w-3" /> Add
+                  </Button>
+                </div>
+                {exercises.map((exercise, i) => (
+                  <div key={i} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    <Input
+                      placeholder="Exercise"
+                      value={exercise.name}
+                      onChange={(e) => {
+                        const updated = [...exercises];
+                        updated[i].name = e.target.value;
+                        setExercises(updated);
+                      }}
+                      className="col-span-2 min-w-0"
+                    />
+                    <Input
+                      placeholder="Sets"
+                      type="number"
+                      value={exercise.sets}
+                      onChange={(e) => {
+                        const updated = [...exercises];
+                        updated[i].sets = e.target.value;
+                        setExercises(updated);
+                      }}
+                    />
+                    <Input
+                      placeholder="Reps"
+                      type="number"
+                      value={exercise.reps}
+                      onChange={(e) => {
+                        const updated = [...exercises];
+                        updated[i].reps = e.target.value;
+                        setExercises(updated);
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
 
-            <div className="flex gap-2">
-              <Button type="submit" disabled={savePending} className="flex-1">
-                {savePending ? "Saving..." : "Save template"}
-              </Button>
-              <Button type="button" variant="outline" onClick={cancel}>
-                Cancel
-              </Button>
-            </div>
-          </form>
+              {saveState?.error && <p className="text-caption text-danger">{saveState.error}</p>}
+              {saveState?.success && <p className="text-caption text-accent-muted">Template saved!</p>}
+
+              <FormActions
+                secondary={
+                  <Button type="button" variant="outline" className="w-full" onClick={cancel}>
+                    Cancel
+                  </Button>
+                }
+              >
+                <FormSubmit loading={savePending}>Save template</FormSubmit>
+              </FormActions>
+            </form>
+          </Panel>
         )}
 
-        {deleteState?.error && <p className="text-sm text-red-400">{deleteState.error}</p>}
+        {deleteState?.error && <p className="text-caption text-danger">{deleteState.error}</p>}
       </CardContent>
     </Card>
   );

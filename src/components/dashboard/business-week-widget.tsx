@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CardHeaderRow } from "@/components/ui/card-header-row";
-import { metricWidgetClass } from "@/components/ui/section-heading";
+import { Metric } from "@/components/ui/metric";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
@@ -19,26 +19,29 @@ export function BusinessWeekWidget({
   return (
     <Card>
       <CardHeader>
-        <CardHeaderRow>
-          <CardTitle>Business This Week</CardTitle>
-          <div className="flex flex-wrap gap-2">
-            {dueCount > 0 && (
-              <Badge variant={followUps.some((item) => item.overdue) ? "danger" : "warning"}>
-                {dueCount} follow-up{dueCount === 1 ? "" : "s"}
+        <CardHeaderRow
+          action={
+            <div className="flex flex-wrap gap-2">
+              {dueCount > 0 && (
+                <Badge variant={followUps.some((item) => item.overdue) ? "danger" : "warning"}>
+                  {dueCount} follow-up{dueCount === 1 ? "" : "s"}
+                </Badge>
+              )}
+              <Badge variant={stats.closes > 0 ? "success" : "default"}>
+                {stats.leads}/{stats.closes}
               </Badge>
-            )}
-            <Badge variant={stats.closes > 0 ? "success" : "default"}>
-              {stats.leads}/{stats.closes}
-            </Badge>
-          </div>
+            </div>
+          }
+        >
+          <CardTitle>Business This Week</CardTitle>
         </CardHeaderRow>
       </CardHeader>
       <CardContent>
-        <p className={metricWidgetClass}>
+        <Metric variant="widget">
           {stats.leads} lead{stats.leads === 1 ? "" : "s"} / {stats.closes} close
           {stats.closes === 1 ? "" : "s"}
-        </p>
-        <p className="text-sm text-zinc-400">
+        </Metric>
+        <p className="text-caption text-text-secondary">
           Quoted {formatCurrency(stats.quoted)} · Won {formatCurrency(stats.won)}
         </p>
         <Link href="/business">

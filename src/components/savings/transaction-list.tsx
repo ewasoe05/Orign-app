@@ -1,4 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
+import { Metric } from "@/components/ui/metric";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyDetailed } from "@/lib/utils";
 import type { SavingsTransaction } from "@/lib/types";
@@ -7,7 +9,7 @@ export function TransactionList({ transactions }: { transactions: SavingsTransac
   if (transactions.length === 0) {
     return (
       <Card>
-        <CardContent className="py-8 text-center text-sm text-zinc-400">
+        <CardContent className="py-8 text-center text-body text-text-secondary">
           No deposits or withdrawals yet. Starting cash is already counted.
         </CardContent>
       </Card>
@@ -16,23 +18,28 @@ export function TransactionList({ transactions }: { transactions: SavingsTransac
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-medium text-zinc-400">Cash log</h2>
+      <h2 className="text-label text-text-secondary">Cash log</h2>
       {transactions.map((tx) => (
         <Card key={tx.id}>
-          <CardHeader className="flex-row items-start justify-between">
-            <div>
-              <CardTitle className="text-sm">{tx.transaction_date}</CardTitle>
-              {tx.notes && <p className="text-xs text-zinc-500">{tx.notes}</p>}
-            </div>
-            <Badge variant={tx.kind === "deposit" ? "success" : "warning"}>
-              {tx.kind === "deposit" ? "Deposit" : "Withdrawal"}
-            </Badge>
+          <CardHeader>
+            <CardHeaderRow
+              action={
+                <Badge variant={tx.kind === "deposit" ? "success" : "warning"}>
+                  {tx.kind === "deposit" ? "Deposit" : "Withdrawal"}
+                </Badge>
+              }
+            >
+              <div>
+                <CardTitle>{tx.transaction_date}</CardTitle>
+                {tx.notes && <p className="text-caption text-text-tertiary">{tx.notes}</p>}
+              </div>
+            </CardHeaderRow>
           </CardHeader>
           <CardContent>
-            <p className={tx.kind === "deposit" ? "text-emerald-400" : "text-amber-300"}>
+            <Metric className={tx.kind === "withdrawal" ? "text-warning" : undefined}>
               {tx.kind === "withdrawal" ? "−" : "+"}
               {formatCurrencyDetailed(Number(tx.amount))}
-            </p>
+            </Metric>
           </CardContent>
         </Card>
       ))}

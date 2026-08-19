@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { deleteWorkout } from "@/lib/actions/fitness";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
@@ -43,7 +44,7 @@ export function WorkoutHistory({
   if (workouts.length === 0) {
     return (
       <Card>
-        <CardContent className="py-8 text-center text-sm text-zinc-400">
+        <CardContent className="py-8 text-center text-body text-text-secondary">
           No workouts logged yet. Start with today&apos;s session.
         </CardContent>
       </Card>
@@ -52,32 +53,37 @@ export function WorkoutHistory({
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-medium text-zinc-400">Workout History</h2>
+      <h2 className="text-label text-text-secondary">Workout History</h2>
       {workouts.map((workout) => (
         <Card key={workout.id}>
-          <CardHeader className="flex-row items-center justify-between">
-            <CardTitle className="text-sm">
-              {workout.workout_date} — {workout.subtype ?? workout.workout_type}
-            </CardTitle>
-            <div className="flex items-center gap-1">
-              <Badge>{workout.workout_type}</Badge>
-              {workout.workout_type !== "floor" && (
-                <>
-                  <Button variant="ghost" size="icon" onClick={() => setEditingId(workout.id)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <form action={deleteAction}>
-                    <input type="hidden" name="workout_id" value={workout.id} />
-                    <Button variant="ghost" size="icon" type="submit">
-                      <Trash2 className="h-4 w-4 text-red-400" />
-                    </Button>
-                  </form>
-                </>
-              )}
-            </div>
+          <CardHeader>
+            <CardHeaderRow
+              action={
+                <div className="flex items-center gap-1">
+                  <Badge>{workout.workout_type}</Badge>
+                  {workout.workout_type !== "floor" && (
+                    <>
+                      <Button variant="ghost" size="icon" onClick={() => setEditingId(workout.id)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <form action={deleteAction}>
+                        <input type="hidden" name="workout_id" value={workout.id} />
+                        <Button variant="ghost" size="icon" type="submit">
+                          <Trash2 className="h-4 w-4 text-danger" />
+                        </Button>
+                      </form>
+                    </>
+                  )}
+                </div>
+              }
+            >
+              <CardTitle>
+                {workout.workout_date} — {workout.subtype ?? workout.workout_type}
+              </CardTitle>
+            </CardHeaderRow>
           </CardHeader>
           {(workout.lift_entries.length > 0 || workout.run_entries.length > 0) && (
-            <CardContent className="space-y-1 text-sm text-zinc-400">
+            <CardContent className="space-y-1 text-body text-text-secondary">
               {workout.lift_entries.map((lift) => (
                 <p key={lift.id}>
                   {lift.exercise}: {lift.weight} lbs × {lift.reps} × {lift.sets}
@@ -93,7 +99,7 @@ export function WorkoutHistory({
           )}
         </Card>
       ))}
-      {deleteState?.error && <p className="text-sm text-red-400">{deleteState.error}</p>}
+      {deleteState?.error && <p className="text-caption text-danger">{deleteState.error}</p>}
     </div>
   );
 }
