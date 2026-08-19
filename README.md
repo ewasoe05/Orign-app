@@ -25,12 +25,7 @@ Open [http://localhost:3000](http://localhost:3000)
 ## Supabase Setup
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Run these in the SQL Editor, in order:
-   - [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql)
-   - [`supabase/migrations/002_fitness_customization.sql`](supabase/migrations/002_fitness_customization.sql)
-   - [`supabase/migrations/003_phase2.sql`](supabase/migrations/003_phase2.sql)
-   - [`supabase/migrations/004_full_plan.sql`](supabase/migrations/004_full_plan.sql)
-   - [`supabase/migrations/005_plan_facts_trade.sql`](supabase/migrations/005_plan_facts_trade.sql)
+2. Add GitHub secrets `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` so pushes to `main` apply `supabase/migrations/` automatically
 3. Copy URL and anon key to `.env.local`
 
 ## Use anywhere (not just at home)

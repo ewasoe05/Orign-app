@@ -82,29 +82,36 @@ ALTER TABLE lift_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE run_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE weekly_reviews ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own settings" ON user_settings;
 CREATE POLICY "Users manage own settings" ON user_settings
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own debt accounts" ON debt_accounts;
 CREATE POLICY "Users manage own debt accounts" ON debt_accounts
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own debt payments" ON debt_payments;
 CREATE POLICY "Users manage own debt payments" ON debt_payments
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own workouts" ON workouts;
 CREATE POLICY "Users manage own workouts" ON workouts
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own lift entries" ON lift_entries;
 CREATE POLICY "Users manage own lift entries" ON lift_entries
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own run entries" ON run_entries;
 CREATE POLICY "Users manage own run entries" ON run_entries
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own weekly reviews" ON weekly_reviews;
 CREATE POLICY "Users manage own weekly reviews" ON weekly_reviews
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
-CREATE INDEX idx_debt_accounts_user ON debt_accounts(user_id);
-CREATE INDEX idx_debt_payments_user ON debt_payments(user_id);
-CREATE INDEX idx_debt_payments_date ON debt_payments(payment_date);
-CREATE INDEX idx_workouts_user_date ON workouts(user_id, workout_date);
-CREATE INDEX idx_weekly_reviews_user ON weekly_reviews(user_id, review_date);
+CREATE INDEX IF NOT EXISTS idx_debt_accounts_user ON debt_accounts(user_id);
+CREATE INDEX IF NOT EXISTS idx_debt_payments_user ON debt_payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_debt_payments_date ON debt_payments(payment_date);
+CREATE INDEX IF NOT EXISTS idx_workouts_user_date ON workouts(user_id, workout_date);
+CREATE INDEX IF NOT EXISTS idx_weekly_reviews_user ON weekly_reviews(user_id, review_date);

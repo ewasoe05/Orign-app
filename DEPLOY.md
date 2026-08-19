@@ -41,13 +41,25 @@ gh repo create two-year-dashboard --private --source=. --push
 ## 2. Create Supabase project (if not done)
 
 1. Go to [supabase.com](https://supabase.com) and create a free project
-2. Open **SQL Editor** and run both migrations in order:
+2. Schema updates are applied automatically on push to `main` by [`.github/workflows/supabase-migrations.yml`](.github/workflows/supabase-migrations.yml).
+3. Add these **GitHub Actions secrets** (repo → Settings → Secrets and variables → Actions):
+
+| Secret | Where to get it |
+|---|---|
+| `SUPABASE_ACCESS_TOKEN` | [Account tokens](https://supabase.com/dashboard/account/tokens) → Generate new token |
+| `SUPABASE_DB_PASSWORD` | Supabase → **Project Settings → Database** (the database password; reset if forgotten) |
+
+Optional: `SUPABASE_PROJECT_ID` — defaults to `gpnazcsoyxwnhuefxofw`.
+
+After secrets are set, push to `main` (or run **Actions → Deploy Supabase migrations → Run workflow**). You do not need the SQL Editor for new migrations.
+
+To apply SQL once by hand instead, run these in order:
    - [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql)
    - [`supabase/migrations/002_fitness_customization.sql`](supabase/migrations/002_fitness_customization.sql)
    - [`supabase/migrations/003_phase2.sql`](supabase/migrations/003_phase2.sql)
    - [`supabase/migrations/004_full_plan.sql`](supabase/migrations/004_full_plan.sql)
    - [`supabase/migrations/005_plan_facts_trade.sql`](supabase/migrations/005_plan_facts_trade.sql)
-3. Go to **Project Settings → API** and copy:
+4. Go to **Project Settings → API** and copy:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
    - **anon public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
@@ -162,5 +174,5 @@ Open [http://localhost:3000](http://localhost:3000)
 - [ ] Vercel project imported and deployed
 - [ ] All 3 env vars set on Vercel
 - [ ] Supabase Site URL + Redirect URLs updated
-- [ ] Tested on phone with cellular data
+- [ ] GitHub Actions secrets `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD` set
 - [ ] Added to Home Screen (optional)

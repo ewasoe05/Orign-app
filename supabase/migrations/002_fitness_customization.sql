@@ -41,12 +41,15 @@ ALTER TABLE workout_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE template_exercises ENABLE ROW LEVEL SECURITY;
 ALTER TABLE weekly_schedule ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own templates" ON workout_templates;
 CREATE POLICY "Users manage own templates" ON workout_templates
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own template exercises" ON template_exercises;
 CREATE POLICY "Users manage own template exercises" ON template_exercises
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own weekly schedule" ON weekly_schedule;
 CREATE POLICY "Users manage own weekly schedule" ON weekly_schedule
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 

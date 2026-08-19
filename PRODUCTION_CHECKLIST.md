@@ -30,15 +30,20 @@ Supabase → Authentication → URL Configuration:
 
 ---
 
-## Supabase SQL (run in order)
+## Supabase SQL (automatic)
 
-If the Full Plan page errors on missing tables, run these in the SQL Editor:
+Pushes to `main` run [`.github/workflows/supabase-migrations.yml`](.github/workflows/supabase-migrations.yml).
 
-1. `supabase/migrations/001_initial_schema.sql`
-2. `supabase/migrations/002_fitness_customization.sql`
-3. `supabase/migrations/003_phase2.sql`
-4. `supabase/migrations/004_full_plan.sql`
-5. `supabase/migrations/005_plan_facts_trade.sql`
+Add GitHub Actions secrets:
+
+| Secret | Where |
+|---|---|
+| `SUPABASE_ACCESS_TOKEN` | [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens) |
+| `SUPABASE_DB_PASSWORD` | Supabase → Project Settings → Database |
+
+Then GitHub → **Actions → Deploy Supabase migrations → Run workflow** once to apply anything still missing.
+
+Manual fallback (SQL Editor, in order): `001` through `005` in `supabase/migrations/`.
 
 ---
 

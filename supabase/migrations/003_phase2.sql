@@ -67,21 +67,27 @@ ALTER TABLE google_reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE habit_checkins ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quarterly_reviews ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own savings settings" ON savings_settings;
 CREATE POLICY "Users manage own savings settings" ON savings_settings
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own savings transactions" ON savings_transactions;
 CREATE POLICY "Users manage own savings transactions" ON savings_transactions
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own leads" ON leads;
 CREATE POLICY "Users manage own leads" ON leads
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own google reviews" ON google_reviews;
 CREATE POLICY "Users manage own google reviews" ON google_reviews
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own habit checkins" ON habit_checkins;
 CREATE POLICY "Users manage own habit checkins" ON habit_checkins
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own quarterly reviews" ON quarterly_reviews;
 CREATE POLICY "Users manage own quarterly reviews" ON quarterly_reviews
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 

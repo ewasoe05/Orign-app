@@ -45,14 +45,18 @@ ALTER TABLE credit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE body_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE plan_facts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own plan checklist" ON plan_checklist;
 CREATE POLICY "Users manage own plan checklist" ON plan_checklist
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own credit logs" ON credit_logs;
 CREATE POLICY "Users manage own credit logs" ON credit_logs
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own body logs" ON body_logs;
 CREATE POLICY "Users manage own body logs" ON body_logs
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own plan facts" ON plan_facts;
 CREATE POLICY "Users manage own plan facts" ON plan_facts
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
