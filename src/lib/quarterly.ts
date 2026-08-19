@@ -1,5 +1,6 @@
 import { differenceInMonths, parseISO, startOfMonth } from "date-fns";
-import { PLAN_START_DATE, QUARTERLY_PLAN } from "@/lib/seed";
+import { QUARTERLY_PLAN } from "@/content/plan";
+import { PLAN_START_DATE } from "@/lib/seed";
 
 export function getCurrentQuarter(planStartDate: string = PLAN_START_DATE): number {
   const start = startOfMonth(parseISO(planStartDate));

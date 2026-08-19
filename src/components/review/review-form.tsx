@@ -7,14 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const QUESTIONS = [
-  { id: "debt_total", label: "What's my current debt total?", type: "input" },
-  { id: "training_sessions", label: "Did I hit 4 training sessions, or my floor?", type: "textarea" },
-  { id: "leads_closes", label: "How many leads and how many closes this week?", type: "textarea" },
-  { id: "do_differently", label: "What's one thing I'm going to do differently?", type: "textarea" },
-  { id: "how_doing", label: "How am I actually doing?", type: "textarea" },
-] as const;
+import { WEEKLY_REVIEW_QUESTIONS } from "@/content/plan";
 
 export function ReviewForm({
   defaults,
@@ -42,7 +35,7 @@ export function ReviewForm({
         <form action={action} className="space-y-4">
           <input type="hidden" name="review_date" value={defaults.reviewDate} />
 
-          {QUESTIONS.map((q, i) => (
+          {WEEKLY_REVIEW_QUESTIONS.map((q, i) => (
             <div key={q.id} className="space-y-2">
               <Label htmlFor={q.id}>
                 {i + 1}. {q.label}

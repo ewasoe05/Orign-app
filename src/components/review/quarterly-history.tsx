@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { QUARTERLY_PLAN } from "@/lib/seed";
+import { QUARTERLY_PLAN } from "@/content/plan";
 import type { QuarterlyReview } from "@/lib/types";
 
 export function QuarterlyHistory({ reviews }: { reviews: QuarterlyReview[] }) {

@@ -3,7 +3,7 @@ import { CashOnHandCard, DownPaymentProgress } from "@/components/savings/cash-c
 import { TransactionForm } from "@/components/savings/transaction-form";
 import { MilestoneTimeline } from "@/components/savings/milestone-timeline";
 import { TransactionList } from "@/components/savings/transaction-list";
-import { PlanChecklist } from "@/components/plan/plan-checklist";
+import { ChecklistTrack } from "@/components/plan/checklist-track";
 import { DuplexCashPlan } from "@/components/plan/plan-reference";
 import { getSavingsSummary, getSavingsTransactions } from "@/lib/actions/savings";
 import { getPlanChecklist } from "@/lib/actions/plan";
@@ -34,11 +34,7 @@ export default async function SavingsPage() {
         </div>
         <div className="space-y-4">
           <MilestoneTimeline cashOnHand={summary.cashOnHand} />
-          <PlanChecklist
-            title="Mortgage prep"
-            description="Month 12 watch inventory. Month 15 talk to a lender."
-            items={checklist.filter((item) => item.section === "mortgage")}
-          />
+          <ChecklistTrack track="mortgage" items={checklist} />
           <TransactionList transactions={transactions} />
         </div>
       </div>

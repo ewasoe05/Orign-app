@@ -1,15 +1,17 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
+import { STRENGTH_TARGETS } from "@/lib/seed";
 import {
   BUSINESS_QUARTER_TARGETS,
   DUPLEX_CASH_BREAKDOWN,
+  FITNESS_BODY_TARGETS,
   HABIT_FLOOR_TABLE,
   PAYOFF_RATIONALE,
+  PAYOFF_RATIONALE_FOOTNOTE,
   POST_DEBT_MONTHLY_CAPACITY,
   STARTING_SNAPSHOT,
-  STRENGTH_TARGETS,
   WEEKLY_REVIEW_QUESTIONS,
-} from "@/lib/seed";
+} from "@/content/plan";
 
 export function StandingSnapshot() {
   return (
@@ -60,9 +62,7 @@ export function PayoffRationale() {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-zinc-400">{PAYOFF_RATIONALE}</p>
-        <p className="mt-2 text-sm text-zinc-400">
-          Budget every month on $4,000 base. Commission overage goes to debt, then savings — never a new lifestyle baseline.
-        </p>
+        <p className="mt-2 text-sm text-zinc-400">{PAYOFF_RATIONALE_FOOTNOTE}</p>
       </CardContent>
     </Card>
   );
@@ -118,8 +118,9 @@ export function WeeklyReviewReference() {
       </CardHeader>
       <CardContent className="space-y-2">
         {WEEKLY_REVIEW_QUESTIONS.map((question, index) => (
-          <p key={question} className="text-sm text-zinc-400">
-            <span className="text-zinc-300">{index + 1}.</span> {question}
+          <p key={question.id} className="text-sm text-zinc-400">
+            <span className="text-zinc-300">{index + 1}.</span>             {question.label}
+            {"detail" in question && question.detail ? ` (${question.detail})` : ""}
           </p>
         ))}
       </CardContent>
@@ -131,10 +132,8 @@ export function FitnessTargetsCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Aug 2028 body targets</CardTitle>
-        <CardDescription>
-          The scale barely moves. You are trading fat for muscle, not shrinking. 10K comfortably.
-        </CardDescription>
+        <CardTitle>{FITNESS_BODY_TARGETS.title}</CardTitle>
+        <CardDescription>{FITNESS_BODY_TARGETS.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
         {STRENGTH_TARGETS.map((target) => (
@@ -147,11 +146,11 @@ export function FitnessTargetsCard() {
         ))}
         <div className="flex justify-between text-sm">
           <span className="text-zinc-400">Longest run</span>
-          <span className="text-zinc-100">10K, comfortably</span>
+          <span className="text-zinc-100">{FITNESS_BODY_TARGETS.longestRun}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-zinc-400">Body</span>
-          <span className="text-zinc-100">~180 lbs, leaner and stronger</span>
+          <span className="text-zinc-100">{FITNESS_BODY_TARGETS.body}</span>
         </div>
       </CardContent>
     </Card>

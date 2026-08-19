@@ -11,7 +11,7 @@ import {
   getGoogleReviewCount,
 } from "@/lib/actions/business";
 import { getPlanChecklist } from "@/lib/actions/plan";
-import { PlanChecklist } from "@/components/plan/plan-checklist";
+import { ChecklistTrack } from "@/components/plan/checklist-track";
 import { BusinessTargets } from "@/components/plan/plan-reference";
 import { seedUserData } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -40,11 +40,7 @@ export default async function BusinessPage() {
             <LeadForm />
             <ReviewCounter count={reviewCount} />
             <BusinessTargets />
-            <PlanChecklist
-              title="Residential systems"
-              description="Q1 capture → Q2 mine → Q3 paid → Q4 recurring. Plus the dad conversation."
-              items={checklist.filter((item) => item.section === "business")}
-            />
+            <ChecklistTrack track="business" items={checklist} />
           </div>
           <div className="space-y-4">
             <FollowUpQueue items={followUps} />

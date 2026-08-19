@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
-import { FOUR_OUTCOMES } from "@/lib/seed";
+import { FOUR_OUTCOMES } from "@/content/plan";
 
 export function FourOutcomes({
   totalDebt,

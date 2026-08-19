@@ -3,6 +3,7 @@ import { ReviewForm } from "@/components/review/review-form";
 import { ReviewHistory } from "@/components/review/review-history";
 import { QuarterlyForm } from "@/components/review/quarterly-form";
 import { QuarterlyHistory } from "@/components/review/quarterly-history";
+import { WeeklyReviewReference } from "@/components/plan/plan-reference";
 import { getWeeklyReviews, getReviewDefaults } from "@/lib/actions/review";
 import { getQuarterlyReviews } from "@/lib/actions/quarterly";
 import { getCurrentQuarter } from "@/lib/quarterly";
@@ -32,6 +33,7 @@ export default async function ReviewPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
         <ReviewForm defaults={defaults} />
         <ReviewHistory reviews={reviews} />
+        <WeeklyReviewReference />
         <QuarterlyForm currentQuarter={currentQuarter} />
         <QuarterlyHistory reviews={quarterly} />
       </div>

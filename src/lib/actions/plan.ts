@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { BodyLog, CreditLog, PlanChecklistItem, PlanFacts } from "@/lib/types";
-import { PLAN_CHECKLIST, PROTEIN_TARGET_G } from "@/lib/seed";
+import { PLAN_CHECKLIST } from "@/content/plan";
+import { PROTEIN_TARGET_G } from "@/lib/seed";
 import { formatLocalDate } from "@/lib/utils";
 import { isMissingRelation } from "@/lib/supabase/errors";
 import { upsertHabitLevel } from "@/lib/actions/habits";

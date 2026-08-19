@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { QUARTERLY_PLAN } from "@/lib/seed";
+import { QUARTERLY_PLAN } from "@/content/plan";
 import { formatLocalDate } from "@/lib/utils";
 
 export function QuarterlyForm({ currentQuarter }: { currentQuarter: number }) {
