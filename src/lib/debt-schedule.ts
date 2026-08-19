@@ -1,5 +1,6 @@
 import { differenceInMonths, parseISO, startOfMonth } from "date-fns";
 import { PAYOFF_SCHEDULE, PLAN_START_DATE, STARTING_DEBT_TOTAL } from "./seed";
+import { getPaceStatus } from "./pace";
 
 export function getCurrentPlanMonth(planStartDate: string = PLAN_START_DATE): number {
   const start = startOfMonth(parseISO(planStartDate));
@@ -7,16 +8,34 @@ export function getCurrentPlanMonth(planStartDate: string = PLAN_START_DATE): nu
   return Math.max(1, differenceInMonths(now, start) + 1);
 }
 
+export function getPlanMonthStart(planStartDate: string, month: number): Date {
+  const [year, monthNum] = planStartDate.split("-").map(Number);
+  return new Date(year, monthNum - 1 + (month - 1), 1);
+}
+
 export function getScheduleStatus(
   currentTotal: number,
   planStartDate: string = PLAN_START_DATE,
+  today: Date = new Date(),
 ) {
   const month = getCurrentPlanMonth(planStartDate);
   const scheduleEntry =
     PAYOFF_SCHEDULE.find((entry) => entry.month === month) ??
     PAYOFF_SCHEDULE[PAYOFF_SCHEDULE.length - 1];
+  const previousTarget =
+    month <= 1
+      ? STARTING_DEBT_TOTAL
+      : (PAYOFF_SCHEDULE.find((entry) => entry.month === month - 1)?.targetRemaining ??
+        STARTING_DEBT_TOTAL);
 
-  const onTrack = currentTotal <= scheduleEntry.targetRemaining + 500;
+  const pace = getPaceStatus({
+    monthStart: previousTarget,
+    monthEndTarget: scheduleEntry.targetRemaining,
+    actual: currentTotal,
+    today,
+    planMonthStart: getPlanMonthStart(planStartDate, month),
+  });
+
   const progress =
     STARTING_DEBT_TOTAL > 0
       ? ((STARTING_DEBT_TOTAL - currentTotal) / STARTING_DEBT_TOTAL) * 100
@@ -25,7 +44,8 @@ export function getScheduleStatus(
   return {
     month,
     scheduleEntry,
-    onTrack,
+    onTrack: pace.status !== "behind",
+    pace,
     progress: Math.min(100, Math.max(0, progress)),
   };
 }

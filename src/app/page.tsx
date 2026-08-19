@@ -82,9 +82,17 @@ export default async function DashboardPage() {
         </div>
         <div className="lg:col-span-2">
           {debtFree ? (
-            <SavingsHero summary={savingsSummary} />
+            <SavingsHero
+              summary={savingsSummary}
+              planStartDate={planStartDate}
+              bundle={projection}
+            />
           ) : (
-            <DebtHero totalDebt={totalDebt} planStartDate={planStartDate} />
+            <DebtHero
+              totalDebt={totalDebt}
+              planStartDate={planStartDate}
+              bundle={projection}
+            />
           )}
         </div>
         <div className="lg:col-span-2">
@@ -95,7 +103,11 @@ export default async function DashboardPage() {
         ) : (
           <MonthlyPaymentWidget paidThisMonth={paidThisMonth} target={debtTarget} />
         )}
-        <SavingsWidget summary={savingsSummary} />
+        <SavingsWidget
+          summary={savingsSummary}
+          planStartDate={planStartDate}
+          bundle={projection}
+        />
         {!debtFree && <MilestoneWidget title={milestone.title} description={milestone.description} />}
         <FitnessWeekWidget summary={fitnessSummary} />
         <BusinessWeekWidget stats={businessStats} />

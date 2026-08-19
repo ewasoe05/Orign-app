@@ -14,7 +14,7 @@ import {
   type ProjectionAccount,
   type ProjectionInput,
 } from "@/lib/projection";
-import { getCurrentPlanMonth } from "@/lib/debt-schedule";
+import { getCurrentPlanMonth, getPlanMonthStart } from "@/lib/debt-schedule";
 
 export type MilestoneProjection = {
   amount: number;
@@ -259,4 +259,30 @@ export function scheduleRowsFromProjection(
           : currentTotal <= centsToDollars(row.endingBalanceCents),
       isCurrent: index + 1 === currentMonthIndex,
     }));
+}
+
+export function getDebtPaceWindow(projection: Projection, planStartDate: string) {
+  const month = getCurrentPlanMonth(planStartDate);
+  const debtRows = projection.rows.filter((row) => row.startingBalanceCents > 0);
+  const row = debtRows[Math.min(Math.max(month, 1), debtRows.length) - 1] ?? debtRows[0];
+  return {
+    month,
+    monthStart: centsToDollars(row?.startingBalanceCents ?? 0),
+    monthEndTarget: centsToDollars(row?.endingBalanceCents ?? 0),
+    planMonthStart: getPlanMonthStart(planStartDate, month),
+    label: row?.label ?? "",
+  };
+}
+
+export function getSavingsPaceWindow(projection: Projection, planStartDate: string) {
+  const month = getCurrentPlanMonth(planStartDate);
+  const index = Math.min(Math.max(month, 1), Math.max(projection.rows.length, 1)) - 1;
+  const row = projection.rows[index];
+  const previous = index > 0 ? projection.rows[index - 1] : null;
+  return {
+    month,
+    monthStart: centsToDollars(previous?.cashCents ?? BUDGET.startingCashCents),
+    monthEndTarget: centsToDollars(row?.cashCents ?? BUDGET.startingCashCents),
+    planMonthStart: getPlanMonthStart(planStartDate, month),
+  };
 }

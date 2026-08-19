@@ -2,17 +2,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/utils";
+import { getPaceStatus, paceBadgeVariant } from "@/lib/pace";
+import { getDebtPaceWindow } from "@/lib/projection-bridge";
 import { getScheduleStatus } from "@/lib/debt-schedule";
 import { STARTING_DEBT_TOTAL } from "@/lib/seed";
+import type { UserProjectionBundle } from "@/lib/projection-bridge";
 
 export function DebtHero({
   totalDebt,
   planStartDate,
+  bundle,
 }: {
   totalDebt: number;
   planStartDate: string;
+  bundle?: UserProjectionBundle;
 }) {
-  const { onTrack, progress, scheduleEntry } = getScheduleStatus(totalDebt, planStartDate);
+  const fallback = getScheduleStatus(totalDebt, planStartDate);
+  const window = bundle ? getDebtPaceWindow(bundle.projection, planStartDate) : null;
+  const pace = window
+    ? getPaceStatus({
+        monthStart: window.monthStart,
+        monthEndTarget: window.monthEndTarget,
+        actual: totalDebt,
+        today: new Date(),
+        planMonthStart: window.planMonthStart,
+      })
+    : fallback.pace;
+  const progress = fallback.progress;
+  const month = window?.month ?? fallback.month;
   const paidOff = STARTING_DEBT_TOTAL - totalDebt;
 
   return (
@@ -20,12 +37,10 @@ export function DebtHero({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Total Debt</CardTitle>
-          <Badge variant={onTrack ? "success" : "warning"}>
-            {onTrack ? "On track" : "Behind schedule"}
-          </Badge>
+          <Badge variant={paceBadgeVariant(pace.status)}>{pace.label}</Badge>
         </div>
         <CardDescription>
-          Month {scheduleEntry.month}: target {formatCurrency(scheduleEntry.targetRemaining)}
+          Month {month}: {pace.subline}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
