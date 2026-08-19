@@ -4,10 +4,12 @@ A personal web app to track your 2-year life plan: debt payoff, fitness, and wee
 
 ## Features
 
-- **Dashboard** — debt progress, monthly payments, fitness streak, review reminders
+- **Dashboard** — debt or savings hero, habit floors, fitness, business, review reminders
 - **Debt Tracker** — 5 pre-seeded accounts, payment logging, payoff chart, 10-month schedule
+- **Savings** — cash log, $30K down payment progress, duplex milestones
 - **Fitness Log** — workout/lift/run logging, floor habit, weekly calendar, strength targets
-- **Weekly Review** — 5-question Sunday review with history
+- **Business** — lead sheet, follow-up queue, Google review count, weekly stats
+- **Full plan** — four outcomes, Q1–Q8 one-pager, first-two-weeks / mortgage / business / capacity checklists
 
 ## Quick Start
 
@@ -23,7 +25,12 @@ Open [http://localhost:3000](http://localhost:3000)
 ## Supabase Setup
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Run [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql) in the SQL Editor
+2. Run these in the SQL Editor, in order:
+   - [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql)
+   - [`supabase/migrations/002_fitness_customization.sql`](supabase/migrations/002_fitness_customization.sql)
+   - [`supabase/migrations/003_phase2.sql`](supabase/migrations/003_phase2.sql)
+   - [`supabase/migrations/004_full_plan.sql`](supabase/migrations/004_full_plan.sql)
+   - [`supabase/migrations/005_plan_facts_trade.sql`](supabase/migrations/005_plan_facts_trade.sql)
 3. Copy URL and anon key to `.env.local`
 
 ## Use anywhere (not just at home)

@@ -44,6 +44,9 @@ gh repo create two-year-dashboard --private --source=. --push
 2. Open **SQL Editor** and run both migrations in order:
    - [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql)
    - [`supabase/migrations/002_fitness_customization.sql`](supabase/migrations/002_fitness_customization.sql)
+   - [`supabase/migrations/003_phase2.sql`](supabase/migrations/003_phase2.sql)
+   - [`supabase/migrations/004_full_plan.sql`](supabase/migrations/004_full_plan.sql)
+   - [`supabase/migrations/005_plan_facts_trade.sql`](supabase/migrations/005_plan_facts_trade.sql)
 3. Go to **Project Settings → API** and copy:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
    - **anon public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`

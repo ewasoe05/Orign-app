@@ -19,7 +19,12 @@ const QUESTIONS = [
 export function ReviewForm({
   defaults,
 }: {
-  defaults: { debtTotal: string; reviewDate: string };
+  defaults: {
+    debtTotal: string;
+    reviewDate: string;
+    trainingSessions?: string;
+    leadsCloses?: string;
+  };
 }) {
   const [state, action, pending] = useActionState(
     async (_prev: { error?: string; success?: boolean } | null, formData: FormData) => {
@@ -50,7 +55,19 @@ export function ReviewForm({
                   required
                 />
               ) : (
-                <Textarea id={q.id} name={q.id} rows={3} required />
+                <Textarea
+                  id={q.id}
+                  name={q.id}
+                  rows={3}
+                  required
+                  defaultValue={
+                    q.id === "training_sessions"
+                      ? defaults.trainingSessions
+                      : q.id === "leads_closes"
+                        ? defaults.leadsCloses
+                        : undefined
+                  }
+                />
               )}
             </div>
           ))}

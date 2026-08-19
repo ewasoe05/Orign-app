@@ -24,6 +24,9 @@ import {
 } from "@/lib/actions/fitness";
 import { getUserSettings } from "@/lib/actions/debt";
 import { PLAN_START_DATE, FITNESS_WEEKLY_TARGET, STRENGTH_TARGETS } from "@/lib/seed";
+import { BodyTracker } from "@/components/plan/body-tracker";
+import { FitnessTargetsCard } from "@/components/plan/plan-reference";
+import { getBodyLogs } from "@/lib/actions/plan";
 import { seedUserData } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -56,6 +59,7 @@ export default async function FitnessPage({
     sessions,
     floor,
     runData,
+    bodyLogs,
   ] = await Promise.all([
     getWorkouts(30),
     getUserSettings(),
@@ -66,6 +70,7 @@ export default async function FitnessPage({
     getWeeklySessionCount(),
     hasFloorThisWeek(),
     getRunProgress(),
+    getBodyLogs(),
   ]);
 
   const planStartDate = settings?.plan_start_date ?? PLAN_START_DATE;
@@ -128,6 +133,8 @@ export default async function FitnessPage({
             prefillTemplateId={prefillTemplateId ?? todaySchedule?.template_id}
           />
           <FloorHabitButton />
+          <BodyTracker logs={bodyLogs} />
+          <FitnessTargetsCard />
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, DollarSign, Dumbbell, ClipboardList, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  DollarSign,
+  PiggyBank,
+  Dumbbell,
+  Briefcase,
+  ClipboardList,
+  Map,
+  LogOut,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -10,8 +19,11 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/debt", label: "Debt", icon: DollarSign },
+  { href: "/savings", label: "Savings", icon: PiggyBank },
   { href: "/fitness", label: "Fitness", icon: Dumbbell },
+  { href: "/business", label: "Business", icon: Briefcase },
   { href: "/review", label: "Review", icon: ClipboardList },
+  { href: "/plan", label: "Full Plan", icon: Map },
 ];
 
 export function SidebarNav() {
@@ -27,7 +39,7 @@ export function SidebarNav() {
 
         <nav className="flex flex-1 flex-col gap-1">
           {navItems.map(({ href, label, icon: Icon }) => {
-            const active = pathname === href;
+            const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
               <Link
                 key={href}

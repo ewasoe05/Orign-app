@@ -1,9 +1,13 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { DebtHero } from "@/components/dashboard/debt-hero";
+import { SavingsHero } from "@/components/dashboard/savings-hero";
 import { MonthlyPaymentWidget } from "@/components/dashboard/monthly-payment-widget";
 import { FitnessWeekWidget } from "@/components/dashboard/fitness-week-widget";
 import { ReviewReminderWidget } from "@/components/dashboard/review-reminder-widget";
 import { MilestoneWidget } from "@/components/dashboard/milestone-widget";
+import { SavingsWidget } from "@/components/dashboard/savings-widget";
+import { BusinessWeekWidget } from "@/components/dashboard/business-week-widget";
+import { HabitsStrip } from "@/components/habits/habits-strip";
 import {
   getDebtAccounts,
   getMonthlyPayments,
@@ -12,8 +16,13 @@ import {
 } from "@/lib/actions/debt";
 import { getFitnessDashboardSummary } from "@/lib/actions/fitness";
 import { getReviewDue } from "@/lib/actions/review";
+import { getSavingsSummary } from "@/lib/actions/savings";
+import { getBusinessWeekStats } from "@/lib/actions/business";
+import { getHabitFloorStatuses } from "@/lib/actions/habits";
 import { seedUserData } from "@/lib/actions/auth";
 import { getNextMilestone } from "@/lib/debt-schedule";
+import { FourOutcomes } from "@/components/plan/four-outcomes";
+import { getFitnessPhase } from "@/lib/actions/fitness";
 import { PLAN_START_DATE, MONTHLY_DEBT_TARGET } from "@/lib/seed";
 import { createClient } from "@/lib/supabase/server";
 
@@ -34,6 +43,9 @@ export default async function DashboardPage() {
     paidThisMonth,
     fitnessSummary,
     reviewDue,
+    savingsSummary,
+    businessStats,
+    habits,
   ] = await Promise.all([
     getTotalDebt(),
     getDebtAccounts(),
@@ -41,21 +53,47 @@ export default async function DashboardPage() {
     getMonthlyPayments(new Date().getFullYear(), new Date().getMonth() + 1),
     getFitnessDashboardSummary(),
     getReviewDue(),
+    getSavingsSummary(),
+    getBusinessWeekStats(),
+    getHabitFloorStatuses(),
   ]);
 
   const planStartDate = settings?.plan_start_date ?? PLAN_START_DATE;
   const debtTarget = Number(settings?.monthly_debt_target ?? MONTHLY_DEBT_TARGET);
   const milestone = getNextMilestone(accounts);
+  const debtFree = totalDebt <= 0;
+  const phase = await getFitnessPhase(planStartDate);
 
   return (
     <AppShell>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="lg:col-span-2">
-          <DebtHero totalDebt={totalDebt} planStartDate={planStartDate} />
+          <FourOutcomes
+            totalDebt={totalDebt}
+            cashOnHand={savingsSummary.cashOnHand}
+            weekCommission={businessStats.estimatedCommission}
+            fitnessLabel={phase}
+          />
         </div>
-        <MonthlyPaymentWidget paidThisMonth={paidThisMonth} target={debtTarget} />
-        <MilestoneWidget title={milestone.title} description={milestone.description} />
+        <div className="lg:col-span-2">
+          {debtFree ? (
+            <SavingsHero summary={savingsSummary} />
+          ) : (
+            <DebtHero totalDebt={totalDebt} planStartDate={planStartDate} />
+          )}
+        </div>
+        <div className="lg:col-span-2">
+          <HabitsStrip habits={habits} />
+        </div>
+        {debtFree ? (
+          <MilestoneWidget title={milestone.title} description={milestone.description} />
+        ) : (
+          <MonthlyPaymentWidget paidThisMonth={paidThisMonth} target={debtTarget} />
+        )}
+        <SavingsWidget summary={savingsSummary} />
+        {!debtFree && <MilestoneWidget title={milestone.title} description={milestone.description} />}
         <FitnessWeekWidget summary={fitnessSummary} />
+        <BusinessWeekWidget stats={businessStats} />
         <ReviewReminderWidget isDue={reviewDue} />
       </div>
     </AppShell>

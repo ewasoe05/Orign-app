@@ -142,3 +142,136 @@ export interface FitnessDashboardSummary {
   weekDots: { day: number; label: string; status: "done" | "floor" | "planned" | "rest" | "empty" }[];
   prHighlight: PersonalRecord | null;
 }
+
+export type SavingsKind = "deposit" | "withdrawal";
+export type LeadStatus = "open" | "won" | "lost";
+export type HabitKey = "training" | "business" | "money" | "eating";
+export type TrackStatus = "on_track" | "behind";
+
+export interface SavingsSettings {
+  id: string;
+  user_id: string;
+  starting_cash: number;
+  down_payment_target: number;
+  created_at: string;
+}
+
+export interface SavingsTransaction {
+  id: string;
+  user_id: string;
+  amount: number;
+  kind: SavingsKind;
+  transaction_date: string;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface SavingsSummary {
+  cashOnHand: number;
+  startingCash: number;
+  downPaymentTarget: number;
+  remainingToDownPayment: number;
+  progress: number;
+  nextMilestone: {
+    amount: number;
+    date: string;
+    label: string;
+    description: string;
+  } | null;
+}
+
+export interface Lead {
+  id: string;
+  user_id: string;
+  lead_date: string;
+  source: string;
+  service: string;
+  quoted_amount: number;
+  status: LeadStatus;
+  why_lost: string | null;
+  created_at: string;
+}
+
+export interface BusinessWeekStats {
+  leads: number;
+  closes: number;
+  quoted: number;
+  won: number;
+  estimatedCommission: number;
+}
+
+export interface FollowUpItem {
+  lead: Lead;
+  followUpDay: 2 | 7 | 21;
+  dueDate: string;
+  daysUntilDue: number;
+  overdue: boolean;
+}
+
+export interface GoogleReview {
+  id: string;
+  user_id: string;
+  review_date: string;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface HabitFloorStatus {
+  key: HabitKey;
+  name: string;
+  description: string;
+  hitToday: boolean;
+  missedYesterday: boolean;
+  neverMissTwice: boolean;
+  streak: number;
+  hitsThisWeek: number;
+}
+
+export interface QuarterlyReview {
+  id: string;
+  user_id: string;
+  quarter: number;
+  review_date: string;
+  money_status: TrackStatus;
+  business_status: TrackStatus;
+  body_status: TrackStatus;
+  what_changed: string | null;
+  what_to_adjust: string | null;
+  created_at: string;
+}
+
+export interface PlanChecklistItem {
+  key: string;
+  section: string;
+  label: string;
+  detail: string;
+  completed: boolean;
+}
+
+export interface CreditLog {
+  id: string;
+  user_id: string;
+  score: number;
+  log_date: string;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface BodyLog {
+  id: string;
+  user_id: string;
+  log_date: string;
+  weight_lbs: number | null;
+  protein_grams: number | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface PlanFacts {
+  id: string;
+  user_id: string;
+  expenses_include_car: boolean | null;
+  employment_type: string | null;
+  commission_years: number | null;
+  clear_solutions_trade: string | null;
+}

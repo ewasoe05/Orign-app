@@ -98,4 +98,7 @@ export async function seedUserData(userId: string) {
 
   const { seedFitnessData } = await import("@/lib/fitness-seed");
   await seedFitnessData(supabase, userId);
+
+  const { seedPhase2Data } = await import("@/lib/phase2-seed");
+  await seedPhase2Data(supabase, userId);
 }

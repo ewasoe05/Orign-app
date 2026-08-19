@@ -1,0 +1,39 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/lib/utils";
+import type { FollowUpItem } from "@/lib/types";
+
+export function FollowUpQueue({ items }: { items: FollowUpItem[] }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Follow-up queue</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {items.length === 0 ? (
+          <p className="text-sm text-zinc-400">No open quotes. Day 2 / 7 / 21 stays empty until you log a lead.</p>
+        ) : (
+          items.map((item) => (
+            <div
+              key={`${item.lead.id}-${item.followUpDay}`}
+              className="flex items-start justify-between gap-2 rounded-lg border border-zinc-800 p-3"
+            >
+              <div>
+                <p className="text-sm font-medium">{item.lead.service}</p>
+                <p className="text-xs text-zinc-500">
+                  {item.lead.source} · quoted {formatCurrency(Number(item.lead.quoted_amount))}
+                </p>
+                <p className="mt-1 text-xs text-zinc-400">
+                  Day {item.followUpDay} follow-up · due {item.dueDate}
+                </p>
+              </div>
+              <Badge variant={item.overdue ? "warning" : "default"}>
+                {item.overdue ? "Overdue" : `${item.daysUntilDue}d`}
+              </Badge>
+            </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
+  );
+}

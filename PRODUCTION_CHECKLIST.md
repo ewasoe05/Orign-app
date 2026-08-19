@@ -30,6 +30,18 @@ Supabase → Authentication → URL Configuration:
 
 ---
 
+## Supabase SQL (run in order)
+
+If the Full Plan page errors on missing tables, run these in the SQL Editor:
+
+1. `supabase/migrations/001_initial_schema.sql`
+2. `supabase/migrations/002_fitness_customization.sql`
+3. `supabase/migrations/003_phase2.sql`
+4. `supabase/migrations/004_full_plan.sql`
+5. `supabase/migrations/005_plan_facts_trade.sql`
+
+---
+
 ## After deploy
 
 1. Open Vercel URL on phone (cellular, not home Wi-Fi)
