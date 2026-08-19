@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SectionHeading, metricCompactClass } from "@/components/ui/section-heading";
 import { formatCurrency } from "@/lib/utils";
 import { FOUR_OUTCOMES } from "@/content/plan";
 
@@ -41,23 +42,23 @@ export function FourOutcomes({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-zinc-300">Four outcomes</p>
-        <Link href="/plan" className="text-xs text-emerald-400 hover:text-emerald-300">
-          Open full plan
-        </Link>
-      </div>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <SectionHeading
+        title="Four outcomes"
+        action={
+          <Link href="/plan" className="text-xs text-emerald-400 hover:text-emerald-300">
+            Open full plan
+          </Link>
+        }
+      />
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {FOUR_OUTCOMES.map((outcome) => (
           <Link key={outcome.key} href={OUTCOME_HREFS[outcome.key]}>
-            <Card>
+            <Card className="h-full transition-colors hover:border-zinc-700">
               <CardHeader>
                 <CardTitle className="text-sm">{outcome.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-lg font-semibold text-emerald-400">
-                  {values[outcome.key as keyof typeof values]}
-                </p>
+                <p className={metricCompactClass}>{values[outcome.key as keyof typeof values]}</p>
                 <p className="mt-1 text-xs text-zinc-500">
                   {targets[outcome.key as keyof typeof targets]} · {outcome.metric}
                 </p>

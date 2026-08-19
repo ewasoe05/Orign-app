@@ -63,25 +63,28 @@ export function DynamicExerciseForm({ exercises, onChange, lastLifts }: DynamicE
                 <Trash2 className="h-4 w-4 text-red-400" />
               </Button>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               <Input
                 placeholder="Weight"
                 type="number"
                 step="2.5"
                 value={row.weight}
                 onChange={(e) => updateRow(index, "weight", e.target.value)}
+                className="min-w-0"
               />
               <Input
                 placeholder="Reps"
                 type="number"
                 value={row.reps}
                 onChange={(e) => updateRow(index, "reps", e.target.value)}
+                className="min-w-0"
               />
               <Input
                 placeholder="Sets"
                 type="number"
                 value={row.sets}
                 onChange={(e) => updateRow(index, "sets", e.target.value)}
+                className="min-w-0"
               />
             </div>
             {last && (

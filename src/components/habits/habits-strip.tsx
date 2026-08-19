@@ -3,7 +3,9 @@
 import { useActionState } from "react";
 import { setHabitLevel } from "@/lib/actions/habits";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { HabitFloorStatus, HabitLevel, HabitWeekDot } from "@/lib/types";
 
@@ -37,22 +39,23 @@ function LevelButton({
     <form action={action} className="flex-1">
       <input type="hidden" name="habit_key" value={habitKey} />
       <input type="hidden" name="level" value={level} />
-      <button
+      <Button
         type="submit"
+        size="sm"
+        variant="outline"
         disabled={pending}
         className={cn(
-          "w-full rounded-md border px-2 py-1.5 text-xs font-medium disabled:opacity-60",
-          active
-            ? level === "full"
-              ? "border-emerald-700 bg-emerald-950 text-emerald-300"
+          "h-10 w-full text-xs",
+          active &&
+            (level === "full"
+              ? "border-emerald-700 bg-emerald-950 text-emerald-300 hover:bg-emerald-950"
               : level === "floor"
-                ? "border-amber-700 bg-amber-950 text-amber-300"
-                : "border-zinc-600 bg-zinc-800 text-zinc-200"
-            : "border-zinc-800 text-zinc-400 hover:border-zinc-600",
+                ? "border-amber-700 bg-amber-950 text-amber-300 hover:bg-amber-950"
+                : "border-zinc-600 bg-zinc-800 text-zinc-200 hover:bg-zinc-800"),
         )}
       >
         {label}
-      </button>
+      </Button>
     </form>
   );
 }
@@ -69,10 +72,12 @@ function HabitCard({ habit }: { habit: HabitFloorStatus }) {
             : "border-zinc-800 bg-zinc-950/40",
       )}
     >
-      <div className="mb-2 flex items-center justify-between gap-2">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm font-medium">{habit.name}</p>
         {habit.neverMissTwice ? (
-          <Badge variant="warning">Don&apos;t miss twice — today matters</Badge>
+          <Badge variant="warning">
+            <span title="Don't miss twice — today matters">Miss twice risk</span>
+          </Badge>
         ) : habit.todayLevel === "full" ? (
           <Badge variant="success">Full</Badge>
         ) : habit.todayLevel === "floor" ? (
@@ -91,7 +96,7 @@ function HabitCard({ habit }: { habit: HabitFloorStatus }) {
         ))}
       </div>
       <p className="mb-2 text-xs text-zinc-500">{habit.streak} day streak</p>
-      <div className="flex gap-1">
+      <div className="grid grid-cols-3 gap-2">
         <LevelButton habitKey={habit.key} level="full" label="Full" active={habit.todayLevel === "full"} />
         <LevelButton habitKey={habit.key} level="floor" label="Floor" active={habit.todayLevel === "floor"} />
         <LevelButton habitKey={habit.key} level="missed" label="Miss" active={habit.todayLevel === "missed"} />
@@ -105,9 +110,11 @@ export function HabitsStrip({ habits }: { habits: HabitFloorStatus[] }) {
 
   return (
     <Card className={warningCount > 0 ? "border-amber-900/50" : undefined}>
-      <CardHeader className="flex-row items-center justify-between">
-        <CardTitle>Habit Floors</CardTitle>
-        {warningCount > 0 && <Badge variant="warning">Never miss twice</Badge>}
+      <CardHeader>
+        <CardHeaderRow>
+          <CardTitle>Habit Floors</CardTitle>
+          {warningCount > 0 && <Badge variant="warning">Never miss twice</Badge>}
+        </CardHeaderRow>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">

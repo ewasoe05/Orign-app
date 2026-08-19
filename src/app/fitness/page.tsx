@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { FitnessStats } from "@/components/fitness/fitness-stats";
 import { TodayWorkout } from "@/components/fitness/today-workout";
 import { WeekCalendar } from "@/components/fitness/week-calendar";
@@ -150,11 +151,17 @@ export default async function FitnessPage({
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <ScheduleEditor schedule={schedule} templates={templates} />
-          <TemplateManager templates={templates} />
+          <CollapsibleSection title="Weekly schedule" description="Set lift, run, and rest days">
+            <ScheduleEditor schedule={schedule} templates={templates} />
+          </CollapsibleSection>
+          <CollapsibleSection title="Workout templates" description="Save reusable lift and run templates">
+            <TemplateManager templates={templates} />
+          </CollapsibleSection>
         </div>
 
-        <WorkoutHistory workouts={workouts} templates={templates} lastLifts={lastLifts} />
+        <CollapsibleSection title="Workout history" description="Recent sessions and edits">
+          <WorkoutHistory workouts={workouts} templates={templates} lastLifts={lastLifts} />
+        </CollapsibleSection>
       </div>
     </AppShell>
   );

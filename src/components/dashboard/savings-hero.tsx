@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
+import { metricHeroClass } from "@/components/ui/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency, formatCurrencyDetailed } from "@/lib/utils";
@@ -34,10 +36,10 @@ export function SavingsHero({
     <Link href="/savings" className="block">
       <Card className="border-emerald-900/50 bg-gradient-to-br from-emerald-950/40 to-zinc-900">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <CardHeaderRow>
             <CardTitle>Savings remaining</CardTitle>
             {pace && <Badge variant={paceBadgeVariant(pace.status)}>{pace.label}</Badge>}
-          </div>
+          </CardHeaderRow>
           <CardDescription>
             {remaining <= 0
               ? "Down payment stacked. Close on the duplex."
@@ -47,9 +49,7 @@ export function SavingsHero({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-4xl font-bold tracking-tight text-emerald-400 lg:text-5xl">
-            {formatCurrencyDetailed(summary.cashOnHand)}
-          </p>
+          <p className={metricHeroClass}>{formatCurrencyDetailed(summary.cashOnHand)}</p>
           <Progress value={summary.progress} />
           <div className="flex justify-between text-sm text-zinc-400">
             <span>{formatCurrency(summary.cashOnHand)} on hand</span>

@@ -102,7 +102,7 @@ export function WorkoutForm({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="workout_type">Type</Label>
               <Select
@@ -153,7 +153,7 @@ export function WorkoutForm({
           )}
 
           {(workoutType === "run" || workoutType === "walk") && (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="distance_miles">Distance (mi)</Label>
                 <Input
