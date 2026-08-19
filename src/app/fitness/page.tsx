@@ -4,11 +4,12 @@ import { FitnessStats } from "@/components/fitness/fitness-stats";
 import { TodayWorkout } from "@/components/fitness/today-workout";
 import { WeekCalendar } from "@/components/fitness/week-calendar";
 import { WorkoutForm, FloorHabitButton } from "@/components/fitness/workout-form";
-import { WorkoutHistory } from "@/components/fitness/workout-history";
-import { TemplateManager } from "@/components/fitness/template-manager";
-import { ScheduleEditor } from "@/components/fitness/schedule-editor";
+const WorkoutHistory = dynamic(() => import("@/components/fitness/workout-history").then(m => m.WorkoutHistory));
+const TemplateManager = dynamic(() => import("@/components/fitness/template-manager").then(m => m.TemplateManager));
+const ScheduleEditor = dynamic(() => import("@/components/fitness/schedule-editor").then(m => m.ScheduleEditor));
 import { PRBoard } from "@/components/fitness/pr-board";
-import { StrengthChart } from "@/components/fitness/strength-chart";
+import dynamic from "next/dynamic";
+const StrengthChart = dynamic(() => import("@/components/fitness/strength-chart").then(m => m.StrengthChart));
 import { VolumeSparkline } from "@/components/fitness/volume-sparkline";
 import {
   getWorkouts,
@@ -28,7 +29,7 @@ import {
 import { getUserSettings } from "@/lib/actions/debt";
 import { PLAN_START_DATE, FITNESS_WEEKLY_TARGET, PROTEIN_TARGET_G } from "@/lib/seed";
 import { BodyTracker } from "@/components/plan/body-tracker";
-import { WeightChart } from "@/components/fitness/weight-chart";
+const WeightChart = dynamic(() => import("@/components/fitness/weight-chart").then(m => m.WeightChart));
 import { FitnessTargetsCard } from "@/components/plan/plan-reference";
 import { getBodyLogs } from "@/lib/actions/plan";
 import { seedUserData } from "@/lib/actions/auth";
@@ -85,10 +86,12 @@ export default async function FitnessPage({
 
   const planStartDate = settings?.plan_start_date ?? PLAN_START_DATE;
   const fitnessTarget = Number(settings?.fitness_target ?? FITNESS_WEEKLY_TARGET);
-  const phaseInfo = await getFitnessPhaseDetails(planStartDate);
-  const targetProgress = await getTargetProgress(prs);
+  const [phaseInfo, targetProgress, weeklyVolume] = await Promise.all([
+    getFitnessPhaseDetails(planStartDate),
+    getTargetProgress(prs),
+    getWeeklyVolume(),
+  ]);
   const proteinStats = proteinHitRate(bodyLogs, PROTEIN_TARGET_G);
-  const weeklyVolume = await getWeeklyVolume();
 
   const todayDow = getTodayDayOfWeek();
   const todaySchedule = schedule.find((d) => d.day_of_week === todayDow);
@@ -101,13 +104,12 @@ export default async function FitnessPage({
     .filter((dot) => dot.status === "floor")
     .map((dot) => dot.date);
 
-  const strengthData: Record<string, StrengthChartPoint[]> = {};
-  for (const target of targetProgress) {
-    strengthData[target.exercise] = await getStrengthChartData(target.exercise);
-  }
-
   const allExerciseNames = templates.flatMap((t) => t.exercises.map((e) => e.exercise_name));
-  const lastLifts = await getLastLiftsForExercises([...new Set(allExerciseNames)]);
+  const [strengthDataEntries, lastLifts] = await Promise.all([
+    Promise.all(targetProgress.map(async (target) => [target.exercise, await getStrengthChartData(target.exercise)] as const)),
+    getLastLiftsForExercises([...new Set(allExerciseNames)]),
+  ]);
+  const strengthData: Record<string, StrengthChartPoint[]> = Object.fromEntries(strengthDataEntries);
 
   return (
     <AppShell>

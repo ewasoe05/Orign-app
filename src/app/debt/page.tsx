@@ -1,7 +1,8 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { AccountPriorityEditor } from "@/components/debt/account-priority-editor";
 import { PaymentForm } from "@/components/debt/payment-form";
-import { PayoffChart } from "@/components/debt/payoff-chart";
+import dynamic from "next/dynamic";
+const PayoffChart = dynamic(() => import("@/components/debt/payoff-chart").then(m => m.PayoffChart));
 import { ScheduleTable } from "@/components/debt/schedule-table";
 import { InterestPanel } from "@/components/debt/interest-panel";
 import { WhatIfSlider } from "@/components/debt/what-if-slider";
