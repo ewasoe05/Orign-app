@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { DebtAccount, DebtPayment } from "@/lib/types";
 import { upsertHabitLevel } from "@/lib/actions/habits";
+import { contiguousPriorities, sortAccountsByPayoffOrder } from "@/lib/debt-priority";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -24,7 +25,7 @@ export async function getDebtAccounts(): Promise<DebtAccount[]> {
     .order("current_balance", { ascending: true });
 
   if (error) throw error;
-  return (data ?? []) as DebtAccount[];
+  return sortAccountsByPayoffOrder((data ?? []) as DebtAccount[]);
 }
 
 export async function getDebtPayments(): Promise<DebtPayment[]> {
@@ -37,6 +38,55 @@ export async function getDebtPayments(): Promise<DebtPayment[]> {
 
   if (error) throw error;
   return (data ?? []) as DebtPayment[];
+}
+
+export async function reorderDebtAccounts(accountIds: string[]) {
+  const { supabase, userId } = await getUserId();
+
+  if (!accountIds.length) {
+    return { error: "No accounts to reorder" };
+  }
+
+  const accounts = await getDebtAccounts();
+  const activeAccounts = accounts.filter((account) => !account.is_paid_off);
+
+  if (accountIds.length !== activeAccounts.length) {
+    return { error: "Account list mismatch" };
+  }
+
+  const knownIds = new Set(activeAccounts.map((account) => account.id));
+  if (accountIds.some((id) => !knownIds.has(id))) {
+    return { error: "Invalid account in order" };
+  }
+
+  const assignments = contiguousPriorities(accountIds);
+
+  // Two-phase update avoids unique (user_id, priority) collisions mid-write.
+  for (const { id, priority } of assignments) {
+    const { error } = await supabase
+      .from("debt_accounts")
+      .update({ priority: priority + 1000 })
+      .eq("id", id)
+      .eq("user_id", userId);
+
+    if (error) return { error: error.message };
+  }
+
+  for (const { id, priority } of assignments) {
+    const { error } = await supabase
+      .from("debt_accounts")
+      .update({ priority })
+      .eq("id", id)
+      .eq("user_id", userId);
+
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/debt");
+  revalidatePath("/savings");
+  revalidatePath("/plan");
+  return { success: true };
 }
 
 export async function getTotalDebt(): Promise<number> {
