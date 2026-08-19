@@ -9,8 +9,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PROTEIN_TARGET_G, STARTING_WEIGHT_LBS, TARGET_WEIGHT_LBS } from "@/lib/seed";
 import { formatLocalDate } from "@/lib/utils";
 import type { BodyLog } from "@/lib/types";
+import type { ProteinHitRate } from "@/lib/fitness-metrics";
 
-export function BodyTracker({ logs }: { logs: BodyLog[] }) {
+export function BodyTracker({
+  logs,
+  proteinStats,
+}: {
+  logs: BodyLog[];
+  proteinStats: ProteinHitRate;
+}) {
   const latest = logs[0];
   const [state, action, pending] = useActionState(
     async (_prev: { error?: string; success?: boolean } | null, formData: FormData) => {
@@ -29,6 +36,30 @@ export function BodyTracker({ logs }: { logs: BodyLog[] }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
+        <div className="rounded-md border border-zinc-800 p-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-zinc-400">Protein · last 7 days</span>
+            <span className="font-medium text-zinc-200">
+              {proteinStats.hits}/{proteinStats.days} at {PROTEIN_TARGET_G}g+
+            </span>
+          </div>
+          <div className="mt-2 flex gap-1">
+            {proteinStats.dayStatuses.map((day) => (
+              <div
+                key={day.date}
+                title={`${day.date.slice(5)}: ${day.hit ? "hit" : day.logged ? "below target" : "not logged"}`}
+                className={`h-2 flex-1 rounded-full ${
+                  day.hit
+                    ? "bg-emerald-500"
+                    : day.logged
+                      ? "bg-amber-600/60"
+                      : "bg-zinc-800"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
         {latest && (
           <p className="text-sm text-zinc-300">
             Last: {latest.log_date}

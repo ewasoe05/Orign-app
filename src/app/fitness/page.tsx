@@ -8,9 +8,10 @@ import { TemplateManager } from "@/components/fitness/template-manager";
 import { ScheduleEditor } from "@/components/fitness/schedule-editor";
 import { PRBoard } from "@/components/fitness/pr-board";
 import { StrengthChart } from "@/components/fitness/strength-chart";
+import { VolumeSparkline } from "@/components/fitness/volume-sparkline";
 import {
   getWorkouts,
-  getFitnessPhase,
+  getFitnessPhaseDetails,
   getWeeklySchedule,
   getTemplates,
   getPersonalRecords,
@@ -18,12 +19,13 @@ import {
   getWeekStreak,
   getWeeklySessionCount,
   hasFloorThisWeek,
-  getStrengthProgress,
+  getStrengthChartData,
   getRunProgress,
   getLastLiftsForExercises,
+  getWeeklyVolume,
 } from "@/lib/actions/fitness";
 import { getUserSettings } from "@/lib/actions/debt";
-import { PLAN_START_DATE, FITNESS_WEEKLY_TARGET, STRENGTH_TARGETS } from "@/lib/seed";
+import { PLAN_START_DATE, FITNESS_WEEKLY_TARGET, PROTEIN_TARGET_G } from "@/lib/seed";
 import { BodyTracker } from "@/components/plan/body-tracker";
 import { FitnessTargetsCard } from "@/components/plan/plan-reference";
 import { getBodyLogs } from "@/lib/actions/plan";
@@ -31,6 +33,8 @@ import { seedUserData } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getWeekStartDate } from "@/lib/utils";
 import { getHabitFloorStatuses } from "@/lib/actions/habits";
+import { proteinHitRate } from "@/lib/fitness-metrics";
+import type { StrengthChartPoint } from "@/lib/fitness-metrics";
 
 function getTodayDayOfWeek(): number {
   const day = new Date().getDay();
@@ -79,8 +83,10 @@ export default async function FitnessPage({
 
   const planStartDate = settings?.plan_start_date ?? PLAN_START_DATE;
   const fitnessTarget = Number(settings?.fitness_target ?? FITNESS_WEEKLY_TARGET);
-  const phase = await getFitnessPhase(planStartDate);
+  const phaseInfo = await getFitnessPhaseDetails(planStartDate);
   const targetProgress = await getTargetProgress(prs);
+  const proteinStats = proteinHitRate(bodyLogs, PROTEIN_TARGET_G);
+  const weeklyVolume = await getWeeklyVolume();
 
   const todayDow = getTodayDayOfWeek();
   const todaySchedule = schedule.find((d) => d.day_of_week === todayDow);
@@ -93,9 +99,9 @@ export default async function FitnessPage({
     .filter((dot) => dot.status === "floor")
     .map((dot) => dot.date);
 
-  const strengthData: Record<string, { date: string; weight: number; reps: number }[]> = {};
-  for (const target of STRENGTH_TARGETS) {
-    strengthData[target.exercise] = await getStrengthProgress(target.exercise);
+  const strengthData: Record<string, StrengthChartPoint[]> = {};
+  for (const target of targetProgress) {
+    strengthData[target.exercise] = await getStrengthChartData(target.exercise);
   }
 
   const allExerciseNames = templates.flatMap((t) => t.exercises.map((e) => e.exercise_name));
@@ -105,7 +111,7 @@ export default async function FitnessPage({
     <AppShell>
       <div className="space-y-4">
         <FitnessStats
-          phase={phase}
+          phaseInfo={phaseInfo}
           sessions={sessions}
           target={fitnessTarget}
           streak={streak}
@@ -127,8 +133,9 @@ export default async function FitnessPage({
           <PRBoard prs={prs} targetProgress={targetProgress} />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <StrengthChart strengthData={strengthData} runData={runData} />
+          <VolumeSparkline weeks={weeklyVolume} />
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -138,7 +145,7 @@ export default async function FitnessPage({
             prefillTemplateId={prefillTemplateId ?? todaySchedule?.template_id}
           />
           <FloorHabitButton />
-          <BodyTracker logs={bodyLogs} />
+          <BodyTracker logs={bodyLogs} proteinStats={proteinStats} />
           <FitnessTargetsCard />
         </div>
 

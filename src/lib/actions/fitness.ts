@@ -15,8 +15,22 @@ import type {
   WorkoutWithDetails,
 } from "@/lib/types";
 import { DAY_LABELS, FITNESS_WEEKLY_TARGET, STRENGTH_TARGETS } from "@/lib/seed";
-import { addDaysIso, getWeekStartDate } from "@/lib/utils";
+import { addDaysIso, formatLocalDate, getWeekStartDate } from "@/lib/utils";
 import { upsertHabitLevel, hasTrainingFloorThisWeek, getHabitFloorStatuses } from "@/lib/actions/habits";
+import { isMissingRelation } from "@/lib/supabase/errors";
+import {
+  aggregatePersonalRecords,
+  buildStrengthChartPoints,
+  computeWeeklyVolume,
+  findBestRecord,
+  getFitnessPhaseInfo,
+  isNewPRThisWeek,
+  matchesExercise,
+  shouldInsertSessionPR,
+  type FitnessPhaseInfo,
+  type PersonalRecordRow,
+  type StrengthChartPoint,
+} from "@/lib/fitness-metrics";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -27,8 +41,109 @@ async function getUserId() {
   return { supabase, userId: user.id };
 }
 
-function getWeekStart(): string {
-  return getWeekStartDate();
+async function fetchPersonalRecordRows(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<PersonalRecordRow[]> {
+  const { data, error } = await supabase
+    .from("personal_records")
+    .select("exercise, weight, reps, record_date, source")
+    .eq("user_id", userId);
+
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
+
+  return (data ?? []).map((row) => ({
+    exercise: row.exercise,
+    weight: Number(row.weight),
+    reps: row.reps,
+    record_date: row.record_date,
+    source: row.source as PersonalRecordRow["source"],
+  }));
+}
+
+async function fetchLiftMaxRows(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<PersonalRecordRow[]> {
+  const { data: lifts, error } = await supabase
+    .from("lift_entries")
+    .select("exercise, weight, reps, workouts!inner(workout_date)")
+    .eq("user_id", userId)
+    .order("weight", { ascending: false });
+
+  if (error) throw error;
+
+  const prMap = new Map<string, PersonalRecordRow>();
+
+  for (const lift of lifts ?? []) {
+    const key = lift.exercise.toLowerCase();
+    const weight = Number(lift.weight);
+    const workoutDate = (lift.workouts as unknown as { workout_date: string }).workout_date;
+    const existing = prMap.get(key);
+
+    if (!existing || weight > existing.weight) {
+      prMap.set(key, {
+        exercise: lift.exercise,
+        weight,
+        reps: lift.reps,
+        record_date: workoutDate,
+        source: "session",
+      });
+    }
+  }
+
+  return Array.from(prMap.values());
+}
+
+async function detectSessionPRs(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  workoutDate: string,
+  insertedLifts: { id: string; exercise: string; weight: number; reps: number }[],
+) {
+  if (!insertedLifts.length) return;
+
+  const existing = [
+    ...(await fetchPersonalRecordRows(supabase, userId)),
+    ...(await fetchLiftMaxRows(supabase, userId)),
+  ];
+  const rowsToInsert: {
+    user_id: string;
+    exercise: string;
+    weight: number;
+    reps: number;
+    record_date: string;
+    source: "session";
+    lift_entry_id: string;
+  }[] = [];
+
+  for (const lift of insertedLifts) {
+    if (!shouldInsertSessionPR(lift.exercise, lift.weight, existing)) continue;
+    rowsToInsert.push({
+      user_id: userId,
+      exercise: lift.exercise,
+      weight: lift.weight,
+      reps: lift.reps,
+      record_date: workoutDate,
+      source: "session",
+      lift_entry_id: lift.id,
+    });
+    existing.push({
+      exercise: lift.exercise,
+      weight: lift.weight,
+      reps: lift.reps,
+      record_date: workoutDate,
+      source: "session",
+    });
+  }
+
+  if (!rowsToInsert.length) return;
+
+  const { error } = await supabase.from("personal_records").insert(rowsToInsert);
+  if (error && !isMissingRelation(error)) throw error;
 }
 
 function getTodayDayOfWeek(): number {
@@ -104,7 +219,7 @@ export async function getWorkoutById(id: string): Promise<WorkoutWithDetails | n
 
 export async function getWeeklySessionCount(): Promise<number> {
   const { supabase, userId } = await getUserId();
-  const weekStart = getWeekStart();
+  const weekStart = getWeekStartDate();
 
   const { data, error } = await supabase
     .from("workouts")
@@ -197,34 +312,70 @@ export async function getLastLiftsForExercises(
 
 export async function getPersonalRecords(): Promise<PersonalRecord[]> {
   const { supabase, userId } = await getUserId();
+  const weekStart = getWeekStartDate();
 
-  const { data: lifts, error } = await supabase
-    .from("lift_entries")
-    .select("exercise, weight, reps, workouts!inner(workout_date)")
-    .eq("user_id", userId)
-    .order("weight", { ascending: false });
+  const [tableRows, liftRows] = await Promise.all([
+    fetchPersonalRecordRows(supabase, userId),
+    fetchLiftMaxRows(supabase, userId),
+  ]);
 
-  if (error) throw error;
+  const rows = [...tableRows, ...liftRows];
+  if (!rows.length) return [];
 
-  const prMap = new Map<string, PersonalRecord>();
+  const best = aggregatePersonalRecords(rows);
 
-  for (const lift of lifts ?? []) {
-    const key = lift.exercise.toLowerCase();
-    const existing = prMap.get(key);
-    const weight = Number(lift.weight);
-    const workoutDate = (lift.workouts as unknown as { workout_date: string }).workout_date;
+  return best
+    .map((record) => ({
+      exercise: record.exercise,
+      weight: record.weight,
+      reps: record.reps,
+      date: record.record_date,
+      source: record.source,
+      isNewThisWeek:
+        isNewPRThisWeek(record.record_date, weekStart) &&
+        findBestRecord(rows, record.exercise)?.weight === record.weight &&
+        tableRows.some(
+          (row) =>
+            row.weight === record.weight &&
+            row.record_date === record.record_date &&
+            isNewPRThisWeek(row.record_date, weekStart) &&
+            matchesExercise(row.exercise, record.exercise),
+        ),
+    }))
+    .sort((a, b) => b.weight - a.weight);
+}
 
-    if (!existing || weight > existing.weight) {
-      prMap.set(key, {
-        exercise: lift.exercise,
-        weight,
-        reps: lift.reps,
-        date: workoutDate,
-      });
-    }
+export async function setManualPR(formData: FormData) {
+  const { supabase, userId } = await getUserId();
+
+  const exercise = String(formData.get("exercise") ?? "").trim();
+  const weight = parseFloat(String(formData.get("weight") ?? ""));
+  const reps = parseInt(String(formData.get("reps") ?? "1"), 10);
+  const recordDate = String(formData.get("record_date") || formatLocalDate());
+  const note = String(formData.get("note") ?? "").trim() || null;
+
+  if (!exercise) return { error: "Exercise required" };
+  if (isNaN(weight) || weight <= 0) return { error: "Valid weight required" };
+  if (isNaN(reps) || reps <= 0) return { error: "Valid reps required" };
+
+  const { error } = await supabase.from("personal_records").insert({
+    user_id: userId,
+    exercise,
+    weight,
+    reps,
+    record_date: recordDate,
+    note,
+    source: "manual",
+  });
+
+  if (error) {
+    if (isMissingRelation(error)) return { error: "Personal records not available yet" };
+    return { error: error.message };
   }
 
-  return Array.from(prMap.values()).sort((a, b) => b.weight - a.weight);
+  revalidatePath("/fitness");
+  revalidatePath("/");
+  return { success: true };
 }
 
 export async function getStrengthProgress(exercise: string) {
@@ -244,6 +395,49 @@ export async function getStrengthProgress(exercise: string) {
     weight: Number(entry.weight),
     reps: entry.reps,
   }));
+}
+
+export async function getStrengthChartData(exercise: string): Promise<StrengthChartPoint[]> {
+  const { supabase, userId } = await getUserId();
+
+  const { data, error } = await supabase
+    .from("lift_entries")
+    .select("weight, reps, sets, exercise, workouts!inner(workout_date)")
+    .eq("user_id", userId)
+    .order("workouts(workout_date)", { ascending: true });
+
+  if (error) return [];
+
+  const entries = (data ?? [])
+    .filter((entry) => matchesExercise(entry.exercise, exercise))
+    .map((entry) => ({
+      date: (entry.workouts as unknown as { workout_date: string }).workout_date,
+      weight: Number(entry.weight),
+      reps: entry.reps,
+      sets: entry.sets,
+    }));
+
+  return buildStrengthChartPoints(entries);
+}
+
+export async function getWeeklyVolume() {
+  const { supabase, userId } = await getUserId();
+
+  const { data, error } = await supabase
+    .from("lift_entries")
+    .select("weight, reps, sets, workouts!inner(workout_date)")
+    .eq("user_id", userId);
+
+  if (error) return computeWeeklyVolume([]);
+
+  const entries = (data ?? []).map((entry) => ({
+    date: (entry.workouts as unknown as { workout_date: string }).workout_date,
+    weight: Number(entry.weight),
+    reps: entry.reps,
+    sets: entry.sets,
+  }));
+
+  return computeWeeklyVolume(entries);
 }
 
 export async function getRunProgress() {
@@ -322,7 +516,7 @@ export async function getFitnessDashboardSummary(): Promise<FitnessDashboardSumm
   const target = Number(settings.data?.fitness_target ?? FITNESS_WEEKLY_TARGET);
   const todayDow = getTodayDayOfWeek();
   const todaySchedule = schedule.find((d) => d.day_of_week === todayDow);
-  const weekStart = getWeekStart();
+  const weekStart = getWeekStartDate();
 
   const trainingDots = habits.find((habit) => habit.key === "training")?.weekDots ?? [];
   const weekDots = DAY_LABELS.map((label, i) => {
@@ -389,17 +583,23 @@ export async function logWorkout(formData: FormData) {
 
   const exercises = parseExercises(formData);
   if (exercises.length > 0) {
-    await supabase.from("lift_entries").insert(
-      exercises.map((exercise, index) => ({
-        user_id: userId,
-        workout_id: workout.id,
-        exercise: exercise.name,
-        weight: exercise.weight,
-        reps: exercise.reps,
-        sets: exercise.sets,
-        sort_order: index,
-      })),
-    );
+    const { data: insertedLifts, error: liftError } = await supabase
+      .from("lift_entries")
+      .insert(
+        exercises.map((exercise, index) => ({
+          user_id: userId,
+          workout_id: workout.id,
+          exercise: exercise.name,
+          weight: exercise.weight,
+          reps: exercise.reps,
+          sets: exercise.sets,
+          sort_order: index,
+        })),
+      )
+      .select("id, exercise, weight, reps");
+
+    if (liftError) return { error: liftError.message };
+    await detectSessionPRs(supabase, userId, workoutDate, insertedLifts ?? []);
   }
 
   const distance = parseFloat(String(formData.get("distance_miles") ?? ""));
@@ -446,17 +646,23 @@ export async function updateWorkout(formData: FormData) {
 
   const exercises = parseExercises(formData);
   if (exercises.length > 0) {
-    await supabase.from("lift_entries").insert(
-      exercises.map((exercise, index) => ({
-        user_id: userId,
-        workout_id: workoutId,
-        exercise: exercise.name,
-        weight: exercise.weight,
-        reps: exercise.reps,
-        sets: exercise.sets,
-        sort_order: index,
-      })),
-    );
+    const { data: insertedLifts, error: liftError } = await supabase
+      .from("lift_entries")
+      .insert(
+        exercises.map((exercise, index) => ({
+          user_id: userId,
+          workout_id: workoutId,
+          exercise: exercise.name,
+          weight: exercise.weight,
+          reps: exercise.reps,
+          sets: exercise.sets,
+          sort_order: index,
+        })),
+      )
+      .select("id, exercise, weight, reps");
+
+    if (liftError) return { error: liftError.message };
+    await detectSessionPRs(supabase, userId, workoutDate, insertedLifts ?? []);
   }
 
   const distance = parseFloat(String(formData.get("distance_miles") ?? ""));
@@ -610,14 +816,11 @@ export async function saveWeeklySchedule(formData: FormData) {
 }
 
 export async function getFitnessPhase(planStartDate: string): Promise<string> {
-  const { differenceInMonths, parseISO, startOfMonth } = await import("date-fns");
-  const start = startOfMonth(parseISO(planStartDate));
-  const month = Math.max(1, differenceInMonths(startOfMonth(new Date()), start) + 1);
+  return getFitnessPhaseInfo(planStartDate).phase;
+}
 
-  if (month <= 6) return "Base";
-  if (month <= 12) return "Lean out";
-  if (month <= 18) return "Build";
-  return "Sharpen";
+export async function getFitnessPhaseDetails(planStartDate: string): Promise<FitnessPhaseInfo> {
+  return getFitnessPhaseInfo(planStartDate);
 }
 
 export async function getTargetProgress(prs: PersonalRecord[]) {

@@ -118,11 +118,16 @@ export interface WeeklyScheduleDay {
   created_at: string;
 }
 
+export type PersonalRecordSource = "manual" | "session";
+
 export interface PersonalRecord {
   exercise: string;
   weight: number;
   reps: number;
   date: string;
+  source?: PersonalRecordSource;
+  note?: string | null;
+  isNewThisWeek?: boolean;
 }
 
 export interface LastLift {
