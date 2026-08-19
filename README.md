@@ -26,11 +26,15 @@ Open [http://localhost:3000](http://localhost:3000)
 2. Run [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql) in the SQL Editor
 3. Copy URL and anon key to `.env.local`
 
-## Deploy
+## Use anywhere (not just at home)
 
-See [DEPLOY.md](DEPLOY.md) for full Vercel + Supabase deployment instructions.
+The app runs locally on your PC by default. To use it on your phone or any network:
 
-Set `ALLOWED_EMAIL` in production to restrict signup to your email only.
+1. Run `.\scripts\push-to-github.ps1` (logs into GitHub and pushes the repo)
+2. Import the repo at [vercel.com/new](https://vercel.com/new)
+3. Follow [PRODUCTION_CHECKLIST.md](PRODUCTION_CHECKLIST.md) for env vars and Supabase auth URLs
+
+See [DEPLOY.md](DEPLOY.md) for the full guide.
 
 ## Tech Stack
 
