@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { SavingsSettings, SavingsSummary, SavingsTransaction } from "@/lib/types";
 import { DOWN_PAYMENT_TARGET, SAVINGS_MILESTONES, SAVINGS_STARTING_CASH } from "@/lib/seed";
+import { isMissingRelation } from "@/lib/supabase/errors";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -28,7 +29,10 @@ export async function getSavingsSettings(): Promise<SavingsSettings | null> {
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) return null;
+    throw error;
+  }
   return data as SavingsSettings | null;
 }
 
@@ -41,7 +45,10 @@ export async function getSavingsTransactions(): Promise<SavingsTransaction[]> {
     .order("transaction_date", { ascending: false })
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
   return (data ?? []) as SavingsTransaction[];
 }
 

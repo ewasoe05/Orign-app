@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { QuarterlyReview, TrackStatus } from "@/lib/types";
 import { formatLocalDate } from "@/lib/utils";
+import { isMissingRelation } from "@/lib/supabase/errors";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -23,7 +24,10 @@ export async function getQuarterlyReviews(): Promise<QuarterlyReview[]> {
     .order("review_date", { ascending: false })
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
   return (data ?? []) as QuarterlyReview[];
 }
 

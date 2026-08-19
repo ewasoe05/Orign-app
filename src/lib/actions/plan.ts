@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { BodyLog, CreditLog, PlanChecklistItem, PlanFacts } from "@/lib/types";
 import { PLAN_CHECKLIST } from "@/lib/seed";
 import { formatLocalDate } from "@/lib/utils";
+import { isMissingRelation } from "@/lib/supabase/errors";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -31,7 +32,19 @@ export async function getPlanChecklist(): Promise<PlanChecklistItem[]> {
     .select("item_key, completed")
     .eq("user_id", userId);
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) {
+      return PLAN_CHECKLIST.map((item) => ({
+        key: item.key,
+        section: item.section,
+        label: item.label,
+        detail: item.detail,
+        completed: false,
+      }));
+    }
+    throw error;
+  }
+
   const done = new Set((data ?? []).filter((row) => row.completed).map((row) => row.item_key));
 
   return PLAN_CHECKLIST.map((item) => ({
@@ -87,7 +100,10 @@ export async function getCreditLogs(): Promise<CreditLog[]> {
     .eq("user_id", userId)
     .order("log_date", { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
   return (data ?? []) as CreditLog[];
 }
 
@@ -123,7 +139,10 @@ export async function getBodyLogs(): Promise<BodyLog[]> {
     .order("log_date", { ascending: false })
     .limit(20);
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
   return (data ?? []) as BodyLog[];
 }
 
@@ -156,7 +175,10 @@ export async function getPlanFacts(): Promise<PlanFacts | null> {
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) return null;
+    throw error;
+  }
   return data as PlanFacts | null;
 }
 

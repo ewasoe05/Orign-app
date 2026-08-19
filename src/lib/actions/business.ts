@@ -11,6 +11,7 @@ import type {
 } from "@/lib/types";
 import { COMMISSION_REVENUE_PER_1000 } from "@/lib/seed";
 import { addDaysIso, daysBetween, formatLocalDate, getWeekStartDate } from "@/lib/utils";
+import { isMissingRelation } from "@/lib/supabase/errors";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -36,7 +37,10 @@ export async function getLeads(): Promise<Lead[]> {
     .order("lead_date", { ascending: false })
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
   return (data ?? []) as Lead[];
 }
 
@@ -50,7 +54,12 @@ export async function getBusinessWeekStats(): Promise<BusinessWeekStats> {
     .eq("user_id", userId)
     .gte("lead_date", weekStart);
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) {
+      return { leads: 0, closes: 0, quoted: 0, won: 0, estimatedCommission: 0 };
+    }
+    throw error;
+  }
   const leads = (data ?? []) as Lead[];
   const quoted = leads.reduce((sum, lead) => sum + Number(lead.quoted_amount), 0);
   const wonLeads = leads.filter((lead) => lead.status === "won");
@@ -162,7 +171,10 @@ export async function getGoogleReviews(): Promise<GoogleReview[]> {
     .eq("user_id", userId)
     .order("review_date", { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) return [];
+    throw error;
+  }
   return (data ?? []) as GoogleReview[];
 }
 
@@ -173,7 +185,10 @@ export async function getGoogleReviewCount(): Promise<number> {
     .select("*", { count: "exact", head: true })
     .eq("user_id", userId);
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) return 0;
+    throw error;
+  }
   return count ?? 0;
 }
 

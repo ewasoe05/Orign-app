@@ -63,30 +63,41 @@ export async function submitReview(formData: FormData) {
 }
 
 export async function getReviewDefaults() {
-  const [{ getWeeklySessionCount, hasFloorThisWeek }, { getBusinessWeekStats }, { getHabitFloorStatuses }] =
-    await Promise.all([
-      import("./fitness"),
-      import("./business"),
-      import("./habits"),
+  try {
+    const [{ getWeeklySessionCount, hasFloorThisWeek }, { getBusinessWeekStats }, { getHabitFloorStatuses }] =
+      await Promise.all([
+        import("./fitness"),
+        import("./business"),
+        import("./habits"),
+      ]);
+
+    const [totalDebt, sessions, hasFloor, weekStats, habits] = await Promise.all([
+      getTotalDebt(),
+      getWeeklySessionCount(),
+      hasFloorThisWeek(),
+      getBusinessWeekStats(),
+      getHabitFloorStatuses(),
     ]);
 
-  const [totalDebt, sessions, hasFloor, weekStats, habits] = await Promise.all([
-    getTotalDebt(),
-    getWeeklySessionCount(),
-    hasFloorThisWeek(),
-    getBusinessWeekStats(),
-    getHabitFloorStatuses(),
-  ]);
+    const habitLine = habits
+      .map((habit) => `${habit.name} ${habit.hitsThisWeek}/7`)
+      .join(", ");
+    const floorNote = hasFloor ? " Floor walk logged." : "";
 
-  const habitLine = habits
-    .map((habit) => `${habit.name} ${habit.hitsThisWeek}/7`)
-    .join(", ");
-  const floorNote = hasFloor ? " Floor walk logged." : "";
-
-  return {
-    debtTotal: totalDebt.toFixed(2),
-    reviewDate: new Date().toISOString().slice(0, 10),
-    trainingSessions: `${sessions} training session${sessions === 1 ? "" : "s"} this week.${floorNote} Floors: ${habitLine}.`,
-    leadsCloses: `${weekStats.leads} lead${weekStats.leads === 1 ? "" : "s"} / ${weekStats.closes} close${weekStats.closes === 1 ? "" : "s"} this week. Quoted $${weekStats.quoted.toFixed(0)}, won $${weekStats.won.toFixed(0)}.`,
-  };
+    return {
+      debtTotal: totalDebt.toFixed(2),
+      reviewDate: new Date().toISOString().slice(0, 10),
+      trainingSessions: `${sessions} training session${sessions === 1 ? "" : "s"} this week.${floorNote} Floors: ${habitLine}.`,
+      leadsCloses: `${weekStats.leads} lead${weekStats.leads === 1 ? "" : "s"} / ${weekStats.closes} close${weekStats.closes === 1 ? "" : "s"} this week. Quoted $${weekStats.quoted.toFixed(0)}, won $${weekStats.won.toFixed(0)}.`,
+    };
+  } catch (error) {
+    console.error("getReviewDefaults failed", error);
+    const totalDebt = await getTotalDebt().catch(() => 0);
+    return {
+      debtTotal: totalDebt.toFixed(2),
+      reviewDate: new Date().toISOString().slice(0, 10),
+      trainingSessions: "",
+      leadsCloses: "",
+    };
+  }
 }

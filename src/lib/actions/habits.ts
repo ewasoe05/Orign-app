@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { HabitFloorStatus, HabitKey } from "@/lib/types";
 import { HABIT_FLOORS } from "@/lib/seed";
 import { addDaysIso, formatLocalDate, getWeekStartDate } from "@/lib/utils";
+import { isMissingRelation } from "@/lib/supabase/errors";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -44,7 +45,21 @@ export async function getHabitFloorStatuses(): Promise<HabitFloorStatus[]> {
     .eq("user_id", userId)
     .order("checkin_date", { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelation(error)) {
+      return HABIT_FLOORS.map((floor) => ({
+        key: floor.key,
+        name: floor.name,
+        description: floor.description,
+        hitToday: false,
+        missedYesterday: true,
+        neverMissTwice: false,
+        streak: 0,
+        hitsThisWeek: 0,
+      }));
+    }
+    throw error;
+  }
 
   const byHabit = new Map<HabitKey, Set<string>>();
   for (const floor of HABIT_FLOORS) {
