@@ -28,6 +28,7 @@ import {
 import { getUserSettings } from "@/lib/actions/debt";
 import { PLAN_START_DATE, FITNESS_WEEKLY_TARGET, PROTEIN_TARGET_G } from "@/lib/seed";
 import { BodyTracker } from "@/components/plan/body-tracker";
+import { WeightChart } from "@/components/fitness/weight-chart";
 import { FitnessTargetsCard } from "@/components/plan/plan-reference";
 import { getBodyLogs } from "@/lib/actions/plan";
 import { seedUserData } from "@/lib/actions/auth";
@@ -140,13 +141,17 @@ export default async function FitnessPage({
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <WeightChart logs={bodyLogs} />
+          <BodyTracker logs={bodyLogs} proteinStats={proteinStats} />
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <WorkoutForm
             templates={templates}
             lastLifts={lastLifts}
             prefillTemplateId={prefillTemplateId ?? todaySchedule?.template_id}
           />
           <FloorHabitButton />
-          <BodyTracker logs={bodyLogs} proteinStats={proteinStats} />
           <FitnessTargetsCard />
         </div>
 
