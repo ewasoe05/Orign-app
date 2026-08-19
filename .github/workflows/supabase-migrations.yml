@@ -23,6 +23,13 @@ jobs:
             echo "Password: Supabase → Project Settings → Database"
             exit 1
           fi
+          if [[ "$SUPABASE_ACCESS_TOKEN" != sbp_* ]]; then
+            echo "SUPABASE_ACCESS_TOKEN is the wrong kind of key."
+            echo "Do not use the anon/service JWT (starts with eyJ)."
+            echo "Create a personal access token at https://supabase.com/dashboard/account/tokens"
+            echo "It must start with sbp_"
+            exit 1
+          fi
 
       - uses: actions/checkout@v4
 
@@ -31,7 +38,7 @@ jobs:
           version: latest
 
       - name: Link project
-        run: supabase link --project-ref "${SUPABASE_PROJECT_ID:-gpnazcsoyxwnhuefxofw}"
+        run: supabase link --project-ref "${SUPABASE_PROJECT_ID:-gpnazcsoyxwnhuefxofw}" --password "$SUPABASE_DB_PASSWORD" --yes
 
       - name: Push migrations
         run: supabase db push --yes

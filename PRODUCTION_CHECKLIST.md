@@ -38,7 +38,7 @@ Add GitHub Actions secrets:
 
 | Secret | Where |
 |---|---|
-| `SUPABASE_ACCESS_TOKEN` | [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens) |
+| `SUPABASE_ACCESS_TOKEN` | [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens) — must start with `sbp_`, not the anon `eyJ` key |
 | `SUPABASE_DB_PASSWORD` | Supabase → Project Settings → Database |
 
 Then GitHub → **Actions → Deploy Supabase migrations → Run workflow** once to apply anything still missing.

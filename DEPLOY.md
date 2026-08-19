@@ -46,7 +46,7 @@ gh repo create two-year-dashboard --private --source=. --push
 
 | Secret | Where to get it |
 |---|---|
-| `SUPABASE_ACCESS_TOKEN` | [Account tokens](https://supabase.com/dashboard/account/tokens) → Generate new token |
+| `SUPABASE_ACCESS_TOKEN` | [Account tokens](https://supabase.com/dashboard/account/tokens) → Generate new token. Must start with `sbp_`. Do **not** use the anon key (`eyJ...`). |
 | `SUPABASE_DB_PASSWORD` | Supabase → **Project Settings → Database** (the database password; reset if forgotten) |
 
 Optional: `SUPABASE_PROJECT_ID` — defaults to `gpnazcsoyxwnhuefxofw`.
