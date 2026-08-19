@@ -1,11 +1,13 @@
 import { BottomNav } from "./bottom-nav";
 import { SidebarNav } from "./sidebar-nav";
+import { NavProgress } from "./nav-progress";
 import { signOut } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-page text-text-primary lg:flex">
+      <NavProgress />
       <SidebarNav />
 
       <div className="flex min-h-screen flex-1 flex-col">
