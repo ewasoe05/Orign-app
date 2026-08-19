@@ -210,5 +210,8 @@ export async function savePlanFacts(formData: FormData) {
   if (error) return { error: error.message };
 
   revalidatePlan();
+  revalidatePath("/");
+  revalidatePath("/debt");
+  revalidatePath("/savings");
   return { success: true };
 }

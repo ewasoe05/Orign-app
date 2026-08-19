@@ -24,6 +24,7 @@ import { getTotalDebt, getUserSettings } from "@/lib/actions/debt";
 import { getSavingsSummary } from "@/lib/actions/savings";
 import { getBusinessWeekStats } from "@/lib/actions/business";
 import { getFitnessPhase } from "@/lib/actions/fitness";
+import { getUserProjection } from "@/lib/actions/projection";
 import { getCurrentQuarter } from "@/lib/quarterly";
 import { FITNESS_PHASES, PLAN_PAGE } from "@/content/plan";
 import { PLAN_START_DATE } from "@/lib/seed";
@@ -37,7 +38,7 @@ export default async function PlanPage() {
   } = await supabase.auth.getUser();
   if (user) await seedUserData(user.id);
 
-  const [checklist, facts, credit, totalDebt, savings, business, settings] = await Promise.all([
+  const [checklist, facts, credit, totalDebt, savings, business, settings, bundle] = await Promise.all([
     getPlanChecklist(),
     getPlanFacts(),
     getCreditLogs(),
@@ -45,6 +46,7 @@ export default async function PlanPage() {
     getSavingsSummary(),
     getBusinessWeekStats(),
     getUserSettings(),
+    getUserProjection(),
   ]);
 
   const planStart = settings?.plan_start_date ?? PLAN_START_DATE;
@@ -70,6 +72,8 @@ export default async function PlanPage() {
           cashOnHand={savings.cashOnHand}
           weekCommission={business.estimatedCommission}
           fitnessLabel={phase}
+          debtFreeLabel={bundle.debtFreeLabel}
+          closingLabel={bundle.closingLabel}
         />
 
         <StandingSnapshot />
@@ -94,7 +98,7 @@ export default async function PlanPage() {
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <CreditTracker logs={credit} />
-          <PlanFactsForm facts={facts} />
+          <PlanFactsForm facts={facts} debtFreeLabel={bundle.debtFreeLabel} closingLabel={bundle.closingLabel} />
           <WeeklyReviewReference />
           <FitnessTargetsCard />
         </div>

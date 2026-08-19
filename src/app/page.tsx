@@ -19,6 +19,7 @@ import { getReviewDue } from "@/lib/actions/review";
 import { getSavingsSummary } from "@/lib/actions/savings";
 import { getBusinessWeekStats } from "@/lib/actions/business";
 import { getHabitFloorStatuses } from "@/lib/actions/habits";
+import { getUserProjection } from "@/lib/actions/projection";
 import { seedUserData } from "@/lib/actions/auth";
 import { getNextMilestone } from "@/lib/debt-schedule";
 import { FourOutcomes } from "@/components/plan/four-outcomes";
@@ -46,6 +47,7 @@ export default async function DashboardPage() {
     savingsSummary,
     businessStats,
     habits,
+    projection,
   ] = await Promise.all([
     getTotalDebt(),
     getDebtAccounts(),
@@ -56,6 +58,7 @@ export default async function DashboardPage() {
     getSavingsSummary(),
     getBusinessWeekStats(),
     getHabitFloorStatuses(),
+    getUserProjection(),
   ]);
 
   const planStartDate = settings?.plan_start_date ?? PLAN_START_DATE;
@@ -73,6 +76,8 @@ export default async function DashboardPage() {
             cashOnHand={savingsSummary.cashOnHand}
             weekCommission={businessStats.estimatedCommission}
             fitnessLabel={phase}
+            debtFreeLabel={projection.debtFreeLabel}
+            closingLabel={projection.closingLabel}
           />
         </div>
         <div className="lg:col-span-2">

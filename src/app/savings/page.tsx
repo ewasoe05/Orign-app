@@ -7,6 +7,7 @@ import { ChecklistTrack } from "@/components/plan/checklist-track";
 import { DuplexCashPlan } from "@/components/plan/plan-reference";
 import { getSavingsSummary, getSavingsTransactions } from "@/lib/actions/savings";
 import { getPlanChecklist } from "@/lib/actions/plan";
+import { getUserProjection } from "@/lib/actions/projection";
 import { seedUserData } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -17,10 +18,11 @@ export default async function SavingsPage() {
   } = await supabase.auth.getUser();
   if (user) await seedUserData(user.id);
 
-  const [summary, transactions, checklist] = await Promise.all([
+  const [summary, transactions, checklist, bundle] = await Promise.all([
     getSavingsSummary(),
     getSavingsTransactions(),
     getPlanChecklist(),
+    getUserProjection(),
   ]);
 
   return (
@@ -33,7 +35,7 @@ export default async function SavingsPage() {
           <TransactionForm />
         </div>
         <div className="space-y-4">
-          <MilestoneTimeline cashOnHand={summary.cashOnHand} />
+          <MilestoneTimeline milestones={bundle.milestones} />
           <ChecklistTrack track="mortgage" items={checklist} />
           <TransactionList transactions={transactions} />
         </div>

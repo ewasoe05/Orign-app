@@ -8,17 +8,28 @@ export function FourOutcomes({
   cashOnHand,
   weekCommission,
   fitnessLabel,
+  debtFreeLabel,
+  closingLabel,
 }: {
   totalDebt: number;
   cashOnHand: number;
   weekCommission: number;
   fitnessLabel: string;
+  debtFreeLabel?: string | null;
+  closingLabel?: string | null;
 }) {
   const values = {
     debt: totalDebt <= 0 ? "Debt-free" : formatCurrency(totalDebt) + " left",
     duplex: formatCurrency(cashOnHand) + " cash",
     business: "~" + formatCurrency(weekCommission) + " this week",
     fitness: fitnessLabel,
+  };
+
+  const targets = {
+    debt: debtFreeLabel ? `Projected ${debtFreeLabel}` : FOUR_OUTCOMES[0].target,
+    duplex: closingLabel ? `Projected ${closingLabel}` : FOUR_OUTCOMES[1].target,
+    business: FOUR_OUTCOMES[2].target,
+    fitness: FOUR_OUTCOMES[3].target,
   };
 
   return (
@@ -30,23 +41,23 @@ export function FourOutcomes({
         </Link>
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-      {FOUR_OUTCOMES.map((outcome) => (
-        <Link key={outcome.key} href="/plan">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">{outcome.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-lg font-semibold text-emerald-400">
-                {values[outcome.key as keyof typeof values]}
-              </p>
-              <p className="mt-1 text-xs text-zinc-500">
-                {outcome.target} · {outcome.metric}
-              </p>
-            </CardContent>
-          </Card>
-        </Link>
-      ))}
+        {FOUR_OUTCOMES.map((outcome) => (
+          <Link key={outcome.key} href="/plan">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">{outcome.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-lg font-semibold text-emerald-400">
+                  {values[outcome.key as keyof typeof values]}
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {targets[outcome.key as keyof typeof targets]} · {outcome.metric}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
     </div>
   );

@@ -10,7 +10,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PlanFacts } from "@/lib/types";
 
-export function PlanFactsForm({ facts }: { facts: PlanFacts | null }) {
+export function PlanFactsForm({
+  facts,
+  debtFreeLabel,
+  closingLabel,
+}: {
+  facts: PlanFacts | null;
+  debtFreeLabel?: string | null;
+  closingLabel?: string | null;
+}) {
   const [state, action, pending] = useActionState(
     async (_prev: { error?: string; success?: boolean } | null, formData: FormData) => {
       return savePlanFacts(formData);
@@ -24,6 +32,13 @@ export function PlanFactsForm({ facts }: { facts: PlanFacts | null }) {
         <CardTitle>Still need from you</CardTitle>
         <CardDescription>
           These answers tighten the math. Log FICO in the credit tracker — that is the fifth question.
+          {debtFreeLabel ? (
+            <>
+              {" "}
+              Current projection: debt-free {debtFreeLabel}
+              {closingLabel ? `, duplex cash ${closingLabel}` : ""}.
+            </>
+          ) : null}
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -19,8 +19,10 @@ export function AccountCards({ accounts }: { accounts: DebtAccount[] }) {
           <CardHeader className="flex-row items-start justify-between">
             <div>
               <CardTitle className="text-sm">{account.name}</CardTitle>
-              {account.interest_rate && (
+              {account.interest_rate != null ? (
                 <p className="text-xs text-zinc-500">{account.interest_rate}% APR</p>
+              ) : (
+                <p className="text-xs text-amber-400">Set APR — projection assumes 0% until you log it</p>
               )}
             </div>
             {account.is_paid_off ? (

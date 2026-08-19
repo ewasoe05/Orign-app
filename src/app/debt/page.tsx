@@ -3,19 +3,22 @@ import { AccountCards } from "@/components/debt/account-cards";
 import { PaymentForm } from "@/components/debt/payment-form";
 import { PayoffChart } from "@/components/debt/payoff-chart";
 import { ScheduleTable } from "@/components/debt/schedule-table";
+import { InterestPanel } from "@/components/debt/interest-panel";
+import { WhatIfSlider } from "@/components/debt/what-if-slider";
 import {
   getDebtAccounts,
   getDebtPayments,
   getTotalDebt,
   getUserSettings,
 } from "@/lib/actions/debt";
-import { buildPayoffChartData } from "@/lib/debt-schedule";
+import { getPlanChecklist, getPlanFacts } from "@/lib/actions/plan";
+import { getUserProjection } from "@/lib/actions/projection";
 import { PLAN_START_DATE } from "@/lib/seed";
 import { ChecklistTrack } from "@/components/plan/checklist-track";
 import { PayoffRationale } from "@/components/plan/plan-reference";
-import { getPlanChecklist } from "@/lib/actions/plan";
 import { seedUserData } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
+import { centsToDollars } from "@/lib/projection";
 
 export default async function DebtPage() {
   const supabase = await createClient();
@@ -24,19 +27,16 @@ export default async function DebtPage() {
   } = await supabase.auth.getUser();
   if (user) await seedUserData(user.id);
 
-  const [accounts, payments, totalDebt, settings, checklist] = await Promise.all([
+  const [accounts, totalDebt, settings, checklist, facts, bundle] = await Promise.all([
     getDebtAccounts(),
-    getDebtPayments(),
     getTotalDebt(),
     getUserSettings(),
     getPlanChecklist(),
+    getPlanFacts(),
+    getUserProjection(),
   ]);
 
   const planStartDate = settings?.plan_start_date ?? PLAN_START_DATE;
-  const chartData = buildPayoffChartData(
-    payments.map((p) => ({ payment_date: p.payment_date, amount: Number(p.amount) })),
-    planStartDate,
-  );
 
   return (
     <AppShell>
@@ -45,12 +45,19 @@ export default async function DebtPage() {
           <AccountCards accounts={accounts} />
           <PaymentForm accounts={accounts} />
           <ChecklistTrack track="first_two_weeks" items={checklist} />
+          <WhatIfSlider
+            accounts={accounts}
+            planFacts={facts}
+            planStartDate={planStartDate}
+            defaultOutlay={centsToDollars(bundle.monthlyOutlayCents)}
+          />
         </div>
         <div className="space-y-4">
           <PayoffRationale />
           <ChecklistTrack track="credit_repair" items={checklist} />
-          <PayoffChart data={chartData} />
-          <ScheduleTable currentTotal={totalDebt} planStartDate={planStartDate} />
+          <InterestPanel bundle={bundle} />
+          <PayoffChart data={bundle.chartData} />
+          <ScheduleTable currentTotal={totalDebt} planStartDate={planStartDate} bundle={bundle} />
         </div>
       </div>
     </AppShell>

@@ -93,6 +93,7 @@ export async function logPayment(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/debt");
+  revalidatePath("/savings");
   await upsertHabitLevel("money", "full", paymentDate);
   return { success: true };
 }

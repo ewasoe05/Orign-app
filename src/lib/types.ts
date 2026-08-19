@@ -9,6 +9,7 @@ export interface DebtAccount {
   initial_balance: number;
   current_balance: number;
   interest_rate: number | null;
+  min_payment: number | null;
   priority: number;
   is_paid_off: boolean;
   created_at: string;
