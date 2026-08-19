@@ -1,4 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
+import { metricHeroClass } from "@/components/ui/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/utils";
@@ -35,18 +37,16 @@ export function DebtHero({
   return (
     <Card className="border-emerald-900/50 bg-gradient-to-br from-emerald-950/40 to-zinc-900">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <CardHeaderRow>
           <CardTitle>Total Debt</CardTitle>
           <Badge variant={paceBadgeVariant(pace.status)}>{pace.label}</Badge>
-        </div>
+        </CardHeaderRow>
         <CardDescription>
           Month {month}: {pace.subline}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <p className="text-4xl font-bold tracking-tight text-emerald-400 lg:text-5xl">
-          {formatCurrency(totalDebt)}
-        </p>
+        <p className={metricHeroClass}>{formatCurrency(totalDebt)}</p>
         <Progress value={progress} />
         <div className="flex justify-between text-sm text-zinc-400">
           <span>{formatCurrency(paidOff)} paid off</span>

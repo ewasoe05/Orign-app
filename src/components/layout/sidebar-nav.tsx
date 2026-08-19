@@ -2,29 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  DollarSign,
-  PiggyBank,
-  Dumbbell,
-  Briefcase,
-  ClipboardList,
-  Map,
-  LogOut,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/actions/auth";
 import { Button } from "@/components/ui/button";
-
-const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/debt", label: "Debt", icon: DollarSign },
-  { href: "/savings", label: "Savings", icon: PiggyBank },
-  { href: "/fitness", label: "Fitness", icon: Dumbbell },
-  { href: "/business", label: "Business", icon: Briefcase },
-  { href: "/review", label: "Review", icon: ClipboardList },
-  { href: "/plan", label: "Full Plan", icon: Map },
-];
+import { NAV_ITEMS } from "./nav-items";
 
 export function SidebarNav() {
   const pathname = usePathname();
@@ -38,7 +20,7 @@ export function SidebarNav() {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1">
-          {navItems.map(({ href, label, icon: Icon }) => {
+          {NAV_ITEMS.map(({ href, desktopLabel, icon: Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
               <Link
@@ -52,7 +34,7 @@ export function SidebarNav() {
                 )}
               >
                 <Icon className="h-5 w-5" />
-                {label}
+                {desktopLabel}
               </Link>
             );
           })}

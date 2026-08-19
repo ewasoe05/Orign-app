@@ -51,7 +51,7 @@ export function AccountPriorityEditor({ accounts }: { accounts: DebtAccount[] })
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <p className="text-sm font-medium text-zinc-300">Payoff order</p>
         <p className="text-xs text-zinc-500">Drag to reorder · updates projection</p>
       </div>
@@ -71,9 +71,9 @@ export function AccountPriorityEditor({ accounts }: { accounts: DebtAccount[] })
             pending ? "pointer-events-none opacity-70" : "cursor-grab active:cursor-grabbing"
           }`}
         >
-          <CardHeader className="flex-row items-start justify-between gap-2">
-            <div className="flex items-start gap-2">
-              <GripVertical className="mt-0.5 h-4 w-4 shrink-0 text-zinc-600" aria-hidden />
+          <CardHeader className="flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 items-start gap-2">
+              <GripVertical className="mt-0.5 hidden h-4 w-4 shrink-0 text-zinc-600 sm:block" aria-hidden />
               <div>
                 <CardTitle className="text-sm">{account.name}</CardTitle>
                 {account.interest_rate != null ? (

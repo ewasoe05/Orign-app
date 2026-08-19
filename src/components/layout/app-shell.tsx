@@ -10,7 +10,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-h-screen flex-1 flex-col">
         <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur lg:hidden">
-          <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
+          <div className="mx-auto flex w-full max-w-xl items-center justify-between px-4 py-3">
             <div>
               <p className="text-xs uppercase tracking-wider text-zinc-500">Two-Year Plan</p>
               <h1 className="text-lg font-semibold">Goal Dashboard</h1>
@@ -23,7 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-lg flex-1 px-4 pb-24 pt-4 lg:max-w-7xl lg:px-8 lg:pb-6 lg:pt-8">
+        <main className="mx-auto w-full max-w-xl flex-1 px-4 pb-nav pt-4 md:max-w-3xl lg:max-w-7xl lg:px-8 lg:pb-6 lg:pt-8">
           {children}
         </main>
 

@@ -67,7 +67,7 @@ export function BodyTracker({
             {latest.protein_grams ? ` · ${latest.protein_grams}g protein` : ""}
           </p>
         )}
-        <form action={action} className="grid grid-cols-2 gap-2">
+        <form action={action} className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div className="col-span-2 space-y-1">
             <Label htmlFor="log_date">Date</Label>
             <Input id="log_date" name="log_date" type="date" defaultValue={formatLocalDate()} />

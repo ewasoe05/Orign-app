@@ -74,7 +74,7 @@ export function ScheduleEditor({
           {days.map((day, index) => (
             <div
               key={day.day_of_week}
-              className="grid grid-cols-[3rem_1fr_1fr] items-center gap-2 rounded-lg border border-zinc-800 p-2"
+              className="grid grid-cols-1 items-center gap-2 rounded-lg border border-zinc-800 p-2 sm:grid-cols-[3rem_1fr_1fr]"
             >
               <span className="text-sm font-medium text-zinc-400">{DAY_LABELS[index]}</span>
               <Select

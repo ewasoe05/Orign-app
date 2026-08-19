@@ -124,7 +124,7 @@ export function TemplateManager({ templates }: { templates: WorkoutTemplateWithE
         {isFormOpen && (
           <form action={saveAction} className="space-y-3 rounded-lg border border-zinc-700 p-3">
             {editing && <input type="hidden" name="template_id" value={editing} />}
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div className="space-y-1">
                 <Label>Name</Label>
                 <Input name="name" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -156,7 +156,7 @@ export function TemplateManager({ templates }: { templates: WorkoutTemplateWithE
                 </Button>
               </div>
               {exercises.map((exercise, i) => (
-                <div key={i} className="grid grid-cols-4 gap-2">
+                <div key={i} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <Input
                     placeholder="Exercise"
                     value={exercise.name}
@@ -165,7 +165,7 @@ export function TemplateManager({ templates }: { templates: WorkoutTemplateWithE
                       updated[i].name = e.target.value;
                       setExercises(updated);
                     }}
-                    className="col-span-2"
+                    className="col-span-2 min-w-0"
                   />
                   <Input
                     placeholder="Sets"

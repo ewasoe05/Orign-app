@@ -31,7 +31,7 @@ function ManualPRForm({ exercise }: { exercise: string }) {
   }
 
   return (
-    <form action={action} className="mt-2 grid grid-cols-2 gap-2 rounded-md border border-zinc-800 p-2">
+    <form action={action} className="mt-2 grid grid-cols-1 gap-2 rounded-md border border-zinc-800 p-2 sm:grid-cols-2">
       <input type="hidden" name="exercise" value={exercise} />
       <div className="col-span-2 space-y-1">
         <Label htmlFor={`${exercise}-date`}>Date</Label>
