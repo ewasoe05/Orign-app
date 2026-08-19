@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { formatLocalDate } from "@/lib/utils";
 import type { WeeklyReview } from "@/lib/types";
 import { getTotalDebt } from "./debt";
 
@@ -28,11 +29,10 @@ export async function getWeeklyReviews(): Promise<WeeklyReview[]> {
 
 export async function getReviewDue(): Promise<boolean> {
   const now = new Date();
-  const isSunday = now.getDay() === 0;
-  if (!isSunday) return false;
+  if (now.getDay() !== 0) return false;
 
   const reviews = await getWeeklyReviews();
-  const today = now.toISOString().slice(0, 10);
+  const today = formatLocalDate(now);
   return !reviews.some((r) => r.review_date === today);
 }
 
@@ -86,7 +86,7 @@ export async function getReviewDefaults() {
 
     return {
       debtTotal: totalDebt.toFixed(2),
-      reviewDate: new Date().toISOString().slice(0, 10),
+      reviewDate: formatLocalDate(),
       trainingSessions: `${sessions} training session${sessions === 1 ? "" : "s"} this week.${floorNote} Floors: ${habitLine}.`,
       leadsCloses: `${weekStats.leads} lead${weekStats.leads === 1 ? "" : "s"} / ${weekStats.closes} close${weekStats.closes === 1 ? "" : "s"} this week. Quoted $${weekStats.quoted.toFixed(0)}, won $${weekStats.won.toFixed(0)}.`,
     };
@@ -95,7 +95,7 @@ export async function getReviewDefaults() {
     const totalDebt = await getTotalDebt().catch(() => 0);
     return {
       debtTotal: totalDebt.toFixed(2),
-      reviewDate: new Date().toISOString().slice(0, 10),
+      reviewDate: formatLocalDate(),
       trainingSessions: "",
       leadsCloses: "",
     };

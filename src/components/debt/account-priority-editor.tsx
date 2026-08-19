@@ -6,6 +6,7 @@ import { reorderDebtAccounts } from "@/lib/actions/debt";
 import { sortAccountsByPayoffOrder } from "@/lib/debt-priority";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DueDateBadge } from "@/components/debt/due-date-badge";
 import { formatCurrencyDetailed } from "@/lib/utils";
 import type { DebtAccount } from "@/lib/types";
 
@@ -84,7 +85,10 @@ export function AccountPriorityEditor({ accounts }: { accounts: DebtAccount[] })
                 )}
               </div>
             </div>
-            <Badge>Priority {index + 1}</Badge>
+            <div className="flex flex-col items-end gap-1">
+              <Badge>Priority {index + 1}</Badge>
+              <DueDateBadge dueDay={account.due_day_of_month} />
+            </div>
           </CardHeader>
           <CardContent>
             <p className="text-xl font-semibold">

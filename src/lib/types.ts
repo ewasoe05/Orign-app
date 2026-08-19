@@ -11,6 +11,7 @@ export interface DebtAccount {
   interest_rate: number | null;
   min_payment: number | null;
   priority: number;
+  due_day_of_month: number | null;
   is_paid_off: boolean;
   created_at: string;
 }
@@ -289,4 +290,21 @@ export interface PlanFacts {
   employment_type: string | null;
   commission_years: number | null;
   clear_solutions_trade: string | null;
+}
+
+export interface RemindersContext {
+  dismissals: { reminder_key: string; scope: string }[];
+  habits: HabitFloorStatus[];
+  followUps: FollowUpItem[];
+  paidThisMonth: number;
+  debtTarget: number;
+  debtFree: boolean;
+  reviews: WeeklyReview[];
+  quarterlyReviewQuarters: number[];
+  planStartDate: string;
+  accounts: {
+    name: string;
+    due_day_of_month: number | null;
+    is_paid_off: boolean;
+  }[];
 }
