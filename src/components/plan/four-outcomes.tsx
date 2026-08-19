@@ -3,6 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { FOUR_OUTCOMES } from "@/content/plan";
 
+const OUTCOME_HREFS: Record<(typeof FOUR_OUTCOMES)[number]["key"], string> = {
+  debt: "/debt",
+  duplex: "/savings",
+  business: "/business",
+  fitness: "/fitness",
+};
+
 export function FourOutcomes({
   totalDebt,
   cashOnHand,
@@ -42,7 +49,7 @@ export function FourOutcomes({
       </div>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {FOUR_OUTCOMES.map((outcome) => (
-          <Link key={outcome.key} href="/plan">
+          <Link key={outcome.key} href={OUTCOME_HREFS[outcome.key]}>
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm">{outcome.title}</CardTitle>

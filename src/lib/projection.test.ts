@@ -26,7 +26,7 @@ const SEED_ACCOUNTS: ProjectionAccount[] = [
     balanceCents: dollarsToCents(514.16),
     aprBps: 0,
     minPaymentCents: dollarsToCents(25),
-    priority: 1,
+    priority: 2,
   },
   {
     id: "amazon",
@@ -34,7 +34,7 @@ const SEED_ACCOUNTS: ProjectionAccount[] = [
     balanceCents: dollarsToCents(1458.81),
     aprBps: 2700,
     minPaymentCents: dollarsToCents(35),
-    priority: 2,
+    priority: 3,
   },
   {
     id: "quicksilver",
@@ -42,7 +42,7 @@ const SEED_ACCOUNTS: ProjectionAccount[] = [
     balanceCents: dollarsToCents(5648.04),
     aprBps: 2700,
     minPaymentCents: dollarsToCents(113),
-    priority: 3,
+    priority: 4,
   },
   {
     id: "ford",
@@ -163,5 +163,22 @@ describe("project", () => {
       const delta = Math.abs(row.cashCents - check.amountCents);
       assert.ok(delta <= 100, `${month} cash off by $${delta / 100}`);
     }
+  });
+
+  it("breaks duplicate priorities by smallest balance before paying", () => {
+    const duplicatePriorityAccounts: ProjectionAccount[] = [
+      { ...SEED_ACCOUNTS[1], priority: 1 },
+      { ...SEED_ACCOUNTS[0], priority: 1 },
+      ...SEED_ACCOUNTS.slice(2),
+    ];
+
+    const normalized = project(baseInput({ accounts: SEED_ACCOUNTS }));
+    const duplicated = project(baseInput({ accounts: duplicatePriorityAccounts }));
+
+    assert.equal(normalized.debtFreeMonth, duplicated.debtFreeMonth);
+    assert.equal(
+      normalized.rows[0]?.payments[0]?.accountId,
+      duplicated.rows[0]?.payments[0]?.accountId,
+    );
   });
 });

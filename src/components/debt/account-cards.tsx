@@ -1,13 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrencyDetailed } from "@/lib/utils";
+import { sortAccountsByPayoffOrder } from "@/lib/debt-priority";
 import type { DebtAccount } from "@/lib/types";
 
 export function AccountCards({ accounts }: { accounts: DebtAccount[] }) {
-  const sorted = [...accounts].sort((a, b) => {
-    if (a.is_paid_off !== b.is_paid_off) return a.is_paid_off ? 1 : -1;
-    return a.priority - b.priority || Number(a.current_balance) - Number(b.current_balance);
-  });
+  const sorted = sortAccountsByPayoffOrder(accounts);
 
   return (
     <div className="space-y-3">

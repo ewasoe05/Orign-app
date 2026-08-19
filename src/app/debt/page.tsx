@@ -1,5 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { AccountCards } from "@/components/debt/account-cards";
+import { AccountPriorityEditor } from "@/components/debt/account-priority-editor";
 import { PaymentForm } from "@/components/debt/payment-form";
 import { PayoffChart } from "@/components/debt/payoff-chart";
 import { ScheduleTable } from "@/components/debt/schedule-table";
@@ -42,7 +42,7 @@ export default async function DebtPage() {
     <AppShell>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="space-y-4">
-          <AccountCards accounts={accounts} />
+          <AccountPriorityEditor accounts={accounts} />
           <PaymentForm accounts={accounts} />
           <ChecklistTrack track="first_two_weeks" items={checklist} />
           <WhatIfSlider

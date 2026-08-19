@@ -1,6 +1,7 @@
 import { differenceInMonths, parseISO, startOfMonth } from "date-fns";
 import { PAYOFF_SCHEDULE, PLAN_START_DATE, STARTING_DEBT_TOTAL } from "./seed";
 import { getPaceStatus } from "./pace";
+import { comparePayoffOrder } from "./debt-priority";
 
 export function getCurrentPlanMonth(planStartDate: string = PLAN_START_DATE): number {
   const start = startOfMonth(parseISO(planStartDate));
@@ -51,11 +52,26 @@ export function getScheduleStatus(
 }
 
 export function getNextMilestone(
-  accounts: { name: string; is_paid_off: boolean; priority: number }[],
+  accounts: { name: string; is_paid_off: boolean; priority: number; current_balance?: number; id?: string }[],
 ) {
   const active = accounts
     .filter((account) => !account.is_paid_off)
-    .sort((a, b) => a.priority - b.priority);
+    .sort((a, b) =>
+      comparePayoffOrder(
+        {
+          id: a.id ?? a.name,
+          priority: a.priority,
+          current_balance: Number(a.current_balance ?? 0),
+          is_paid_off: false,
+        },
+        {
+          id: b.id ?? b.name,
+          priority: b.priority,
+          current_balance: Number(b.current_balance ?? 0),
+          is_paid_off: false,
+        },
+      ),
+    );
 
   if (active.length === 0) {
     return { title: "Debt-free!", description: "All accounts paid off." };
