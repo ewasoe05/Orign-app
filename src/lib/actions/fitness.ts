@@ -15,6 +15,8 @@ import type {
   WorkoutWithDetails,
 } from "@/lib/types";
 import { DAY_LABELS, FITNESS_WEEKLY_TARGET, STRENGTH_TARGETS } from "@/lib/seed";
+import { addDaysIso, getWeekStartDate } from "@/lib/utils";
+import { upsertHabitLevel, hasTrainingFloorThisWeek, getHabitFloorStatuses } from "@/lib/actions/habits";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -26,12 +28,7 @@ async function getUserId() {
 }
 
 function getWeekStart(): string {
-  const now = new Date();
-  const day = now.getDay();
-  const diff = day === 0 ? 6 : day - 1;
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - diff);
-  return monday.toISOString().slice(0, 10);
+  return getWeekStartDate();
 }
 
 function getTodayDayOfWeek(): number {
@@ -120,19 +117,7 @@ export async function getWeeklySessionCount(): Promise<number> {
 }
 
 export async function hasFloorThisWeek(): Promise<boolean> {
-  const { supabase, userId } = await getUserId();
-  const weekStart = getWeekStart();
-
-  const { data, error } = await supabase
-    .from("workouts")
-    .select("id")
-    .eq("user_id", userId)
-    .eq("workout_type", "floor")
-    .gte("workout_date", weekStart)
-    .limit(1);
-
-  if (error) throw error;
-  return (data?.length ?? 0) > 0;
+  return hasTrainingFloorThisWeek();
 }
 
 export async function getWeeklySchedule(): Promise<WeeklyScheduleDay[]> {
@@ -290,25 +275,24 @@ export async function getWeekStreak(): Promise<number> {
     .eq("user_id", userId)
     .order("workout_date", { ascending: false });
 
-  if (!workouts?.length) return 0;
+  if (!workouts?.length) {
+    return (await hasTrainingFloorThisWeek()) ? 1 : 0;
+  }
 
   let streak = 0;
-  const now = new Date();
-  let weekStart = new Date(now);
-  const day = weekStart.getDay();
-  weekStart.setDate(weekStart.getDate() - (day === 0 ? 6 : day - 1));
+  const currentWeekFloor = await hasTrainingFloorThisWeek();
+  let cursor = getWeekStartDate();
 
   for (let w = 0; w < 52; w++) {
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    const startStr = weekStart.toISOString().slice(0, 10);
-    const endStr = weekEnd.toISOString().slice(0, 10);
+    const startStr = cursor;
+    const endStr = addDaysIso(cursor, 6);
 
     const weekWorkouts = workouts.filter(
       (wo) => wo.workout_date >= startStr && wo.workout_date <= endStr,
     );
     const sessions = weekWorkouts.filter((wo) => wo.workout_type !== "floor").length;
-    const hasFloor = weekWorkouts.some((wo) => wo.workout_type === "floor");
+    const hasFloor =
+      weekWorkouts.some((wo) => wo.workout_type === "floor") || (w === 0 && currentWeekFloor);
 
     if (sessions >= target || hasFloor) {
       streak++;
@@ -316,14 +300,14 @@ export async function getWeekStreak(): Promise<number> {
       break;
     }
 
-    weekStart.setDate(weekStart.getDate() - 7);
+    cursor = addDaysIso(cursor, -7);
   }
 
   return streak;
 }
 
 export async function getFitnessDashboardSummary(): Promise<FitnessDashboardSummary> {
-  const [sessions, hasFloor, workouts, schedule, prs, settings] = await Promise.all([
+  const [sessions, hasFloor, workouts, schedule, prs, settings, habits] = await Promise.all([
     getWeeklySessionCount(),
     hasFloorThisWeek(),
     getWorkouts(14),
@@ -332,6 +316,7 @@ export async function getFitnessDashboardSummary(): Promise<FitnessDashboardSumm
     getUserId().then(({ supabase, userId }) =>
       supabase.from("user_settings").select("fitness_target").eq("user_id", userId).maybeSingle(),
     ),
+    getHabitFloorStatuses(),
   ]);
 
   const target = Number(settings.data?.fitness_target ?? FITNESS_WEEKLY_TARGET);
@@ -339,18 +324,19 @@ export async function getFitnessDashboardSummary(): Promise<FitnessDashboardSumm
   const todaySchedule = schedule.find((d) => d.day_of_week === todayDow);
   const weekStart = getWeekStart();
 
+  const trainingDots = habits.find((habit) => habit.key === "training")?.weekDots ?? [];
   const weekDots = DAY_LABELS.map((label, i) => {
     const dow = i + 1;
     const daySchedule = schedule.find((d) => d.day_of_week === dow);
-    const date = new Date(weekStart);
-    date.setDate(date.getDate() + i);
-    const dateStr = date.toISOString().slice(0, 10);
+    const dateStr = addDaysIso(weekStart, i);
     const dayWorkouts = workouts.filter((w) => w.workout_date === dateStr);
+    const habitDot = trainingDots.find((dot) => dot.date === dateStr);
 
     let status: "done" | "floor" | "planned" | "rest" | "empty" = "empty";
     if (dayWorkouts.some((w) => w.workout_type !== "floor")) status = "done";
-    else if (dayWorkouts.some((w) => w.workout_type === "floor")) status = "floor";
-    else if (daySchedule?.schedule_type === "rest") status = "rest";
+    else if (habitDot?.status === "floor" || dayWorkouts.some((w) => w.workout_type === "floor")) {
+      status = "floor";
+    } else if (daySchedule?.schedule_type === "rest") status = "rest";
     else if (daySchedule) status = "planned";
 
     return { day: dow, label, status };
@@ -372,22 +358,7 @@ export async function getFitnessDashboardSummary(): Promise<FitnessDashboardSumm
 }
 
 export async function logFloorHabit() {
-  const { supabase, userId } = await getUserId();
-  const today = new Date().toISOString().slice(0, 10);
-
-  const { error } = await supabase.from("workouts").insert({
-    user_id: userId,
-    workout_date: today,
-    workout_type: "floor",
-    subtype: "10-min walk",
-    notes: "Floor habit — bad day minimum",
-  });
-
-  if (error) return { error: error.message };
-
-  revalidatePath("/");
-  revalidatePath("/fitness");
-  return { success: true };
+  return upsertHabitLevel("training", "floor");
 }
 
 export async function logWorkout(formData: FormData) {
@@ -447,6 +418,9 @@ export async function logWorkout(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/fitness");
+  if (workoutType !== "floor") {
+    await upsertHabitLevel("training", "full", workoutDate);
+  }
   return { success: true };
 }
 
@@ -499,6 +473,9 @@ export async function updateWorkout(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/fitness");
+  if (workoutType !== "floor") {
+    await upsertHabitLevel("training", "full", workoutDate);
+  }
   return { success: true };
 }
 

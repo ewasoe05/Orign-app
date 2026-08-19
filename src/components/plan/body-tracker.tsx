@@ -24,7 +24,8 @@ export function BodyTracker({ logs }: { logs: BodyLog[] }) {
       <CardHeader>
         <CardTitle>Body + protein</CardTitle>
         <CardDescription>
-          Start {STARTING_WEIGHT_LBS} lbs skinny-fat → ~{TARGET_WEIGHT_LBS} lbs leaner. Protein {PROTEIN_TARGET_G}g/day.
+          Start {STARTING_WEIGHT_LBS} lbs skinny-fat → ~{TARGET_WEIGHT_LBS} lbs leaner. Protein{" "}
+          {PROTEIN_TARGET_G}g/day — hitting it marks Eating full.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">

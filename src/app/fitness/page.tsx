@@ -29,6 +29,8 @@ import { FitnessTargetsCard } from "@/components/plan/plan-reference";
 import { getBodyLogs } from "@/lib/actions/plan";
 import { seedUserData } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
+import { getWeekStartDate } from "@/lib/utils";
+import { getHabitFloorStatuses } from "@/lib/actions/habits";
 
 function getTodayDayOfWeek(): number {
   const day = new Date().getDay();
@@ -60,6 +62,7 @@ export default async function FitnessPage({
     floor,
     runData,
     bodyLogs,
+    habits,
   ] = await Promise.all([
     getWorkouts(30),
     getUserSettings(),
@@ -71,6 +74,7 @@ export default async function FitnessPage({
     hasFloorThisWeek(),
     getRunProgress(),
     getBodyLogs(),
+    getHabitFloorStatuses(),
   ]);
 
   const planStartDate = settings?.plan_start_date ?? PLAN_START_DATE;
@@ -81,16 +85,13 @@ export default async function FitnessPage({
   const todayDow = getTodayDayOfWeek();
   const todaySchedule = schedule.find((d) => d.day_of_week === todayDow);
 
-  const weekStart = (() => {
-    const now = new Date();
-    const day = now.getDay();
-    const diff = day === 0 ? 6 : day - 1;
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - diff);
-    return monday.toISOString().slice(0, 10);
-  })();
-
+  const weekStart = getWeekStartDate();
   const workoutsThisWeek = workouts.filter((w) => w.workout_date >= weekStart);
+  const floorDates = (
+    habits.find((habit) => habit.key === "training")?.weekDots ?? []
+  )
+    .filter((dot) => dot.status === "floor")
+    .map((dot) => dot.date);
 
   const strengthData: Record<string, { date: string; weight: number; reps: number }[]> = {};
   for (const target of STRENGTH_TARGETS) {
@@ -118,7 +119,11 @@ export default async function FitnessPage({
         />
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <WeekCalendar schedule={schedule} workoutsThisWeek={workoutsThisWeek} />
+          <WeekCalendar
+            schedule={schedule}
+            workoutsThisWeek={workoutsThisWeek}
+            floorDates={floorDates}
+          />
           <PRBoard prs={prs} targetProgress={targetProgress} />
         </div>
 

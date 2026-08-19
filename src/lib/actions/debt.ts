@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { DebtAccount, DebtPayment } from "@/lib/types";
+import { upsertHabitLevel } from "@/lib/actions/habits";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -92,6 +93,7 @@ export async function logPayment(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/debt");
+  await upsertHabitLevel("money", "full", paymentDate);
   return { success: true };
 }
 

@@ -146,6 +146,7 @@ export interface FitnessDashboardSummary {
 export type SavingsKind = "deposit" | "withdrawal";
 export type LeadStatus = "open" | "won" | "lost";
 export type HabitKey = "training" | "business" | "money" | "eating";
+export type HabitLevel = "full" | "floor" | "missed";
 export type TrackStatus = "on_track" | "behind";
 
 export interface SavingsSettings {
@@ -216,15 +217,23 @@ export interface GoogleReview {
   created_at: string;
 }
 
+export interface HabitWeekDot {
+  date: string;
+  label: string;
+  status: "full" | "floor" | "miss" | "future" | "unmarked";
+}
+
 export interface HabitFloorStatus {
   key: HabitKey;
   name: string;
   description: string;
   hitToday: boolean;
+  todayLevel: HabitLevel | null;
   missedYesterday: boolean;
   neverMissTwice: boolean;
   streak: number;
   hitsThisWeek: number;
+  weekDots: HabitWeekDot[];
 }
 
 export interface QuarterlyReview {

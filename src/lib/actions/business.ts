@@ -12,6 +12,7 @@ import type {
 import { COMMISSION_REVENUE_PER_1000 } from "@/lib/seed";
 import { addDaysIso, daysBetween, formatLocalDate, getWeekStartDate } from "@/lib/utils";
 import { isMissingRelation } from "@/lib/supabase/errors";
+import { upsertHabitLevel } from "@/lib/actions/habits";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -130,6 +131,7 @@ export async function logLead(formData: FormData) {
 
   if (error) return { error: error.message };
 
+  await upsertHabitLevel("business", "full", leadDate);
   revalidateBusiness();
   return { success: true };
 }

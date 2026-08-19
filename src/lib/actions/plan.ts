@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { BodyLog, CreditLog, PlanChecklistItem, PlanFacts } from "@/lib/types";
-import { PLAN_CHECKLIST } from "@/lib/seed";
+import { PLAN_CHECKLIST, PROTEIN_TARGET_G } from "@/lib/seed";
 import { formatLocalDate } from "@/lib/utils";
 import { isMissingRelation } from "@/lib/supabase/errors";
+import { upsertHabitLevel } from "@/lib/actions/habits";
 
 async function getUserId() {
   const supabase = await createClient();
@@ -162,6 +163,10 @@ export async function logBody(formData: FormData) {
   });
 
   if (error) return { error: error.message };
+
+  if (!isNaN(protein) && protein >= PROTEIN_TARGET_G) {
+    await upsertHabitLevel("eating", "full", logDate);
+  }
 
   revalidatePlan();
   return { success: true };

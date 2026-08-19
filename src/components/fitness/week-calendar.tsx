@@ -2,25 +2,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DAY_LABELS } from "@/lib/seed";
 import type { WeeklyScheduleDay } from "@/lib/types";
+import { addDaysIso, formatLocalDate, getWeekStartDate } from "@/lib/utils";
 
 export function WeekCalendar({
   schedule,
   workoutsThisWeek,
+  floorDates = [],
 }: {
   schedule: WeeklyScheduleDay[];
   workoutsThisWeek: { workout_date: string; subtype: string | null; workout_type: string }[];
+  floorDates?: string[];
 }) {
-  const today = new Date();
-  const day = today.getDay();
-  const diff = day === 0 ? 6 : day - 1;
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - diff);
-
-  const weekDates = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    return d.toISOString().slice(0, 10);
-  });
+  const today = formatLocalDate();
+  const weekStart = getWeekStartDate();
+  const weekDates = DAY_LABELS.map((_, i) => addDaysIso(weekStart, i));
 
   return (
     <Card>
@@ -32,9 +27,9 @@ export function WeekCalendar({
           const dow = i + 1;
           const daySchedule = schedule.find((s) => s.day_of_week === dow);
           const workout = workoutsThisWeek.find((w) => w.workout_date === date);
-          const isToday = date === today.toISOString().slice(0, 10);
+          const isToday = date === today;
           const isRest = daySchedule?.schedule_type === "rest" || !daySchedule;
-          const isFloor = workout?.workout_type === "floor";
+          const isFloor = workout?.workout_type === "floor" || floorDates.includes(date);
 
           let borderClass = "border-zinc-800";
           if (isToday) borderClass = "border-emerald-800 bg-emerald-950/20";
