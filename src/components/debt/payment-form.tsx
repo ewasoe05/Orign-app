@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { logPayment } from "@/lib/actions/debt";
-import { Button } from "@/components/ui/button";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -61,11 +61,13 @@ export function PaymentForm({ accounts }: { accounts: DebtAccount[] }) {
             <Label htmlFor="notes">Notes (optional)</Label>
             <Input id="notes" name="notes" placeholder="Extra payment, minimum, etc." />
           </div>
-          {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
-          {state?.success && <p className="text-sm text-emerald-400">Payment logged!</p>}
-          <Button type="submit" className="w-full" disabled={pending || activeAccounts.length === 0}>
-            {pending ? "Saving..." : "Log payment"}
-          </Button>
+          {state?.error && <p className="text-caption text-danger">{state.error}</p>}
+          {state?.success && <p className="text-caption text-accent-muted">Payment logged!</p>}
+          <FormActions>
+            <FormSubmit loading={pending} disabled={activeAccounts.length === 0}>
+              Log payment
+            </FormSubmit>
+          </FormActions>
         </form>
       </CardContent>
     </Card>
