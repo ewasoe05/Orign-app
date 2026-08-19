@@ -7,7 +7,6 @@ import { InterestPanel } from "@/components/debt/interest-panel";
 import { WhatIfSlider } from "@/components/debt/what-if-slider";
 import {
   getDebtAccounts,
-  getDebtPayments,
   getTotalDebt,
   getUserSettings,
 } from "@/lib/actions/debt";
@@ -15,7 +14,7 @@ import { getPlanChecklist, getPlanFacts } from "@/lib/actions/plan";
 import { getUserProjection } from "@/lib/actions/projection";
 import { PLAN_START_DATE } from "@/lib/seed";
 import { ChecklistTrack } from "@/components/plan/checklist-track";
-import { PayoffRationale } from "@/components/plan/plan-reference";
+import Link from "next/link";
 import { seedUserData } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
 import { centsToDollars } from "@/lib/projection";
@@ -44,7 +43,6 @@ export default async function DebtPage() {
         <div className="space-y-4">
           <AccountPriorityEditor accounts={accounts} />
           <PaymentForm accounts={accounts} />
-          <ChecklistTrack track="first_two_weeks" items={checklist} />
           <WhatIfSlider
             accounts={accounts}
             planFacts={facts}
@@ -53,11 +51,18 @@ export default async function DebtPage() {
           />
         </div>
         <div className="space-y-4">
-          <PayoffRationale />
-          <ChecklistTrack track="credit_repair" items={checklist} />
-          <InterestPanel bundle={bundle} />
           <PayoffChart data={bundle.chartData} />
           <ScheduleTable currentTotal={totalDebt} planStartDate={planStartDate} bundle={bundle} />
+          <InterestPanel bundle={bundle} />
+          <ChecklistTrack track="first_two_weeks" items={checklist} />
+          <ChecklistTrack track="credit_repair" items={checklist} />
+          <p className="text-caption text-text-secondary">
+            Payoff rationale and full debt strategy live on the{" "}
+            <Link href="/plan" className="underline-offset-2 hover:underline">
+              full plan
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </AppShell>

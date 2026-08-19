@@ -12,7 +12,7 @@ import {
 } from "@/lib/actions/business";
 import { getPlanChecklist } from "@/lib/actions/plan";
 import { ChecklistTrack } from "@/components/plan/checklist-track";
-import { BusinessTargets } from "@/components/plan/plan-reference";
+import Link from "next/link";
 import { seedUserData } from "@/lib/actions/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -39,8 +39,14 @@ export default async function BusinessPage() {
           <div className="space-y-4">
             <LeadForm />
             <ReviewCounter count={reviewCount} />
-            <BusinessTargets />
             <ChecklistTrack track="business" items={checklist} />
+            <p className="text-caption text-text-secondary">
+              Business targets on the{" "}
+              <Link href="/plan" className="underline-offset-2 hover:underline">
+                full plan
+              </Link>
+              .
+            </p>
           </div>
           <div className="space-y-4">
             <FollowUpQueue items={followUps} />

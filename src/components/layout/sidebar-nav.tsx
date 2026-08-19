@@ -12,11 +12,11 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex lg:w-60 lg:flex-col lg:border-r lg:border-zinc-800 lg:bg-zinc-950">
+    <aside className="hidden lg:flex lg:w-60 lg:flex-col lg:border-r lg:border-border-subtle lg:bg-page">
       <div className="flex h-full flex-col px-4 py-6">
         <div className="mb-8">
-          <p className="text-xs uppercase tracking-wider text-zinc-500">Two-Year Plan</p>
-          <h1 className="text-lg font-semibold">Goal Dashboard</h1>
+          <h1 className="text-title">Goal Dashboard</h1>
+          <p className="mt-1 text-caption text-text-secondary">Two-year plan</p>
         </div>
 
         <nav className="flex flex-1 flex-col gap-1">
@@ -27,13 +27,15 @@ export function SidebarNav() {
                 key={href}
                 href={href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 text-body font-medium transition-ui focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                   active
-                    ? "bg-emerald-950/50 text-emerald-400"
-                    : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100",
+                    ? "bg-surface-raised text-text-primary"
+                    : "text-text-secondary hover:bg-surface hover:text-text-primary",
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <Icon
+                  className={cn("h-5 w-5", active ? "text-accent-muted" : "text-text-tertiary")}
+                />
                 {desktopLabel}
               </Link>
             );
@@ -41,7 +43,7 @@ export function SidebarNav() {
         </nav>
 
         <form action={signOut} className="mt-auto pt-4">
-          <Button type="submit" variant="ghost" className="w-full justify-start gap-3 text-zinc-400">
+          <Button type="submit" variant="ghost" className="w-full justify-start gap-3 text-text-secondary">
             <LogOut className="h-5 w-5" />
             Sign out
           </Button>

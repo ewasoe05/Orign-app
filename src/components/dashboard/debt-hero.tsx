@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CardHeaderRow } from "@/components/ui/card-header-row";
-import { metricHeroClass } from "@/components/ui/section-heading";
+import { Metric } from "@/components/ui/metric";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/utils";
 import { getPaceStatus, paceBadgeVariant } from "@/lib/pace";
@@ -35,23 +37,27 @@ export function DebtHero({
   const paidOff = STARTING_DEBT_TOTAL - totalDebt;
 
   return (
-    <Card className="border-emerald-900/50 bg-gradient-to-br from-emerald-950/40 to-zinc-900">
+    <Card elevated>
       <CardHeader>
-        <CardHeaderRow>
+        <CardHeaderRow action={<Badge variant={paceBadgeVariant(pace.status)}>{pace.label}</Badge>}>
           <CardTitle>Total Debt</CardTitle>
-          <Badge variant={paceBadgeVariant(pace.status)}>{pace.label}</Badge>
         </CardHeaderRow>
         <CardDescription>
           Month {month}: {pace.subline}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <p className={metricHeroClass}>{formatCurrency(totalDebt)}</p>
+      <CardContent>
+        <Metric variant="display">{formatCurrency(totalDebt)}</Metric>
         <Progress value={progress} />
-        <div className="flex justify-between text-sm text-zinc-400">
+        <div className="flex justify-between text-caption text-text-secondary">
           <span>{formatCurrency(paidOff)} paid off</span>
           <span>{formatCurrency(STARTING_DEBT_TOTAL)} starting</span>
         </div>
+        <Link href="/debt">
+          <Button variant="outline" size="touch" className="w-full">
+            View details
+          </Button>
+        </Link>
       </CardContent>
     </Card>
   );

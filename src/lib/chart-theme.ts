@@ -28,7 +28,10 @@ export function chartTooltipProps(formatter?: (value: number) => string) {
     contentStyle: CHART_TOOLTIP_STYLE,
     ...(formatter
       ? {
-          formatter: (value: number | string) => [formatter(Number(value)), ""] as [string, string],
+          formatter: (value: unknown) => {
+            const num = Number(value);
+            return [formatter(Number.isFinite(num) ? num : 0), ""] as [string, string];
+          },
         }
       : {}),
   };

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SectionHeading, metricCompactClass } from "@/components/ui/section-heading";
+import { InteractiveCard } from "@/components/ui/interactive-card";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Metric } from "@/components/ui/metric";
 import { formatCurrency } from "@/lib/utils";
 import { FOUR_OUTCOMES } from "@/content/plan";
 
@@ -41,30 +43,37 @@ export function FourOutcomes({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <SectionHeading
         title="Four outcomes"
         action={
-          <Link href="/plan" className="text-xs text-emerald-400 hover:text-emerald-300">
+          <Link
+            href="/plan"
+            className="text-caption text-text-secondary underline-offset-2 hover:text-text-primary hover:underline"
+          >
             Open full plan
           </Link>
         }
       />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
         {FOUR_OUTCOMES.map((outcome) => (
-          <Link key={outcome.key} href={OUTCOME_HREFS[outcome.key]}>
-            <Card className="h-full transition-colors hover:border-zinc-700">
-              <CardHeader>
-                <CardTitle className="text-sm">{outcome.title}</CardTitle>
+          <InteractiveCard
+            key={outcome.key}
+            href={OUTCOME_HREFS[outcome.key]}
+            className="min-w-[140px] shrink-0 sm:min-w-0"
+          >
+            <Card className="h-full transition-ui hover:border-border-strong">
+              <CardHeader className="mb-2">
+                <CardTitle className="text-caption">{outcome.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className={metricCompactClass}>{values[outcome.key as keyof typeof values]}</p>
-                <p className="mt-1 text-xs text-zinc-500">
+              <CardContent className="space-y-1">
+                <Metric variant="compact">{values[outcome.key as keyof typeof values]}</Metric>
+                <p className="text-caption text-text-tertiary">
                   {targets[outcome.key as keyof typeof targets]} · {outcome.metric}
                 </p>
               </CardContent>
             </Card>
-          </Link>
+          </InteractiveCard>
         ))}
       </div>
     </div>

@@ -57,18 +57,18 @@ export function LeadList({ leads }: { leads: Lead[] }) {
             {lead.why_lost && <p className="text-caption text-text-secondary">{lead.why_lost}</p>}
             {lead.status === "open" && (
               <div className="flex flex-col gap-2 sm:flex-row">
-                <form action={action}>
+                <form action={action} className="flex-1">
                   <input type="hidden" name="lead_id" value={lead.id} />
                   <input type="hidden" name="status" value="won" />
-                  <Button type="submit" size="sm">
+                  <Button type="submit" variant="outline" size="touch" className="w-full">
                     Won
                   </Button>
                 </form>
-                <form action={action} className="flex flex-1 gap-2">
+                <form action={action} className="flex flex-1 flex-col gap-2 sm:flex-row">
                   <input type="hidden" name="lead_id" value={lead.id} />
                   <input type="hidden" name="status" value="lost" />
-                  <Input name="why_lost" placeholder="Why lost?" className="h-8" required />
-                  <Button type="submit" size="sm" variant="secondary">
+                  <Input name="why_lost" placeholder="Why lost?" required />
+                  <Button type="submit" size="touch" variant="ghost" className="w-full sm:w-auto">
                     Lost
                   </Button>
                 </form>

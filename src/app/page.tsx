@@ -35,9 +35,7 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) {
-    await seedUserData(user.id);
-  }
+  if (user) await seedUserData(user.id);
 
   const [
     totalDebt,
@@ -73,13 +71,20 @@ export default async function DashboardPage() {
 
   return (
     <AppShell>
-      <DashboardSundayOrder
-        reviewWidget={<ReviewReminderWidget context={remindersContext} />}
-      >
+      <DashboardSundayOrder reviewWidget={<ReviewReminderWidget context={remindersContext} />}>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="lg:col-span-2">
             <RemindersPanel context={remindersContext} />
           </div>
+
+          <div className="lg:col-span-2">
+            {debtFree ? (
+              <SavingsHero summary={savingsSummary} planStartDate={planStartDate} bundle={projection} />
+            ) : (
+              <DebtHero totalDebt={totalDebt} planStartDate={planStartDate} bundle={projection} />
+            )}
+          </div>
+
           <div className="lg:col-span-2">
             <FourOutcomes
               totalDebt={totalDebt}
@@ -90,38 +95,20 @@ export default async function DashboardPage() {
               closingLabel={projection.closingLabel}
             />
           </div>
-          <div className="lg:col-span-2">
-            {debtFree ? (
-              <SavingsHero
-                summary={savingsSummary}
-                planStartDate={planStartDate}
-                bundle={projection}
-              />
-            ) : (
-              <DebtHero
-                totalDebt={totalDebt}
-                planStartDate={planStartDate}
-                bundle={projection}
-              />
-            )}
-          </div>
+
+          {!debtFree && (
+            <MonthlyPaymentWidget paidThisMonth={paidThisMonth} target={debtTarget} />
+          )}
+          <SavingsWidget summary={savingsSummary} planStartDate={planStartDate} bundle={projection} />
+          <FitnessWeekWidget summary={fitnessSummary} />
+
           <div className="lg:col-span-2">
             <HabitsStrip habits={habits} />
           </div>
-          {debtFree ? (
-            <MilestoneWidget title={milestone.title} description={milestone.description} />
-          ) : (
-            <MonthlyPaymentWidget paidThisMonth={paidThisMonth} target={debtTarget} />
-          )}
-          <SavingsWidget
-            summary={savingsSummary}
-            planStartDate={planStartDate}
-            bundle={projection}
-          />
+
           {!debtFree && (
             <MilestoneWidget title={milestone.title} description={milestone.description} />
           )}
-          <FitnessWeekWidget summary={fitnessSummary} />
           <BusinessWeekWidget stats={businessStats} followUps={followUps} />
         </div>
       </DashboardSundayOrder>

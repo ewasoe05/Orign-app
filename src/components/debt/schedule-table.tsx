@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
 import { Badge } from "@/components/ui/badge";
+import { Panel } from "@/components/ui/panel";
 import { formatCurrency } from "@/lib/utils";
 import { scheduleRowsFromProjection } from "@/lib/projection-bridge";
 import type { UserProjectionBundle } from "@/lib/projection-bridge";
@@ -17,34 +19,39 @@ export function ScheduleTable({
 
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between gap-2">
-        <CardTitle>Payoff schedule</CardTitle>
-        {!bundle.feasible && <Badge variant="warning">Plan infeasible</Badge>}
+      <CardHeader>
+        <CardHeaderRow
+          action={!bundle.feasible ? <Badge variant="warning">Plan infeasible</Badge> : undefined}
+        >
+          <CardTitle>Payoff schedule</CardTitle>
+        </CardHeaderRow>
       </CardHeader>
       <CardContent className="space-y-2">
         {rows.map((entry) => (
-          <div
+          <Panel
             key={entry.month}
-            className={`flex items-start justify-between gap-2 rounded-lg border p-3 ${
-              entry.isCurrent ? "border-emerald-800 bg-emerald-950/20" : "border-zinc-800"
-            }`}
+            className={
+              entry.isCurrent ? "border-accent/40 bg-success-bg/50" : undefined
+            }
           >
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Month {entry.month}</span>
-                <span className="text-xs text-zinc-500">{entry.label}</span>
-                {entry.complete && <Badge variant="success">Done</Badge>}
-                {entry.isCurrent && !entry.complete && <Badge variant="warning">Current</Badge>}
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-body font-medium">Month {entry.month}</span>
+                  <span className="text-caption text-text-secondary">{entry.label}</span>
+                  {entry.complete && <Badge variant="success">Done</Badge>}
+                  {entry.isCurrent && !entry.complete && <Badge variant="warning">Current</Badge>}
+                </div>
+                <p className="mt-1 text-caption text-text-secondary">{entry.action}</p>
               </div>
-              <p className="mt-1 text-xs text-zinc-400">{entry.action}</p>
+              <span className="shrink-0 text-body font-medium text-text-primary">
+                {formatCurrency(entry.targetRemaining)}
+              </span>
             </div>
-            <span className="shrink-0 text-sm font-medium text-zinc-300">
-              {formatCurrency(entry.targetRemaining)}
-            </span>
-          </div>
+          </Panel>
         ))}
         {bundle.debtFreeLabel && (
-          <p className="text-xs text-zinc-500">
+          <p className="text-caption text-text-secondary">
             Projected debt-free: {bundle.debtFreeLabel}
             {bundle.closingLabel ? ` · Duplex cash ready: ${bundle.closingLabel}` : ""}
           </p>

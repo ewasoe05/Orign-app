@@ -1,10 +1,10 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { CashOnHandCard, DownPaymentProgress } from "@/components/savings/cash-cards";
+import { SavingsHeroCard } from "@/components/savings/cash-cards";
 import { TransactionForm } from "@/components/savings/transaction-form";
 import { MilestoneTimeline } from "@/components/savings/milestone-timeline";
 import { TransactionList } from "@/components/savings/transaction-list";
 import { ChecklistTrack } from "@/components/plan/checklist-track";
-import { DuplexCashPlan } from "@/components/plan/plan-reference";
+import Link from "next/link";
 import { getSavingsSummary, getSavingsTransactions } from "@/lib/actions/savings";
 import { getPlanChecklist } from "@/lib/actions/plan";
 import { getUserProjection } from "@/lib/actions/projection";
@@ -29,10 +29,15 @@ export default async function SavingsPage() {
     <AppShell>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
         <div className="space-y-4">
-          <CashOnHandCard summary={summary} />
-          <DownPaymentProgress summary={summary} />
-          <DuplexCashPlan />
+          <SavingsHeroCard summary={summary} />
           <TransactionForm />
+          <p className="text-caption text-text-secondary">
+            Duplex cash plan details on the{" "}
+            <Link href="/plan" className="underline-offset-2 hover:underline">
+              full plan
+            </Link>
+            .
+          </p>
         </div>
         <div className="space-y-4">
           <MilestoneTimeline milestones={bundle.milestones} />

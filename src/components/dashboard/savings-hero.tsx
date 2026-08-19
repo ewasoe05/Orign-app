@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CardHeaderRow } from "@/components/ui/card-header-row";
-import { metricHeroClass } from "@/components/ui/section-heading";
+import { Metric } from "@/components/ui/metric";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency, formatCurrencyDetailed } from "@/lib/utils";
 import { getPaceStatus, paceBadgeVariant } from "@/lib/pace";
@@ -33,30 +34,36 @@ export function SavingsHero({
     : null;
 
   return (
-    <Link href="/savings" className="block">
-      <Card className="border-emerald-900/50 bg-gradient-to-br from-emerald-950/40 to-zinc-900">
-        <CardHeader>
-          <CardHeaderRow>
-            <CardTitle>Savings remaining</CardTitle>
-            {pace && <Badge variant={paceBadgeVariant(pace.status)}>{pace.label}</Badge>}
-          </CardHeaderRow>
-          <CardDescription>
-            {remaining <= 0
-              ? "Down payment stacked. Close on the duplex."
-              : pace
-                ? pace.subline
-                : `${formatCurrency(remaining)} left to the $30K down payment`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className={metricHeroClass}>{formatCurrencyDetailed(summary.cashOnHand)}</p>
-          <Progress value={summary.progress} />
-          <div className="flex justify-between text-sm text-zinc-400">
-            <span>{formatCurrency(summary.cashOnHand)} on hand</span>
-            <span>{formatCurrency(summary.downPaymentTarget)} target</span>
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
+    <Card elevated>
+      <CardHeader>
+        <CardHeaderRow
+          action={
+            pace ? <Badge variant={paceBadgeVariant(pace.status)}>{pace.label}</Badge> : undefined
+          }
+        >
+          <CardTitle>Savings remaining</CardTitle>
+        </CardHeaderRow>
+        <CardDescription>
+          {remaining <= 0
+            ? "Down payment stacked. Close on the duplex."
+            : pace
+              ? pace.subline
+              : `${formatCurrency(remaining)} left to the $30K down payment`}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Metric variant="display">{formatCurrencyDetailed(summary.cashOnHand)}</Metric>
+        <Progress value={summary.progress} />
+        <div className="flex justify-between text-caption text-text-secondary">
+          <span>{formatCurrency(summary.cashOnHand)} on hand</span>
+          <span>{formatCurrency(summary.downPaymentTarget)} target</span>
+        </div>
+        <Link href="/savings">
+          <Button variant="outline" size="touch" className="w-full">
+            View details
+          </Button>
+        </Link>
+      </CardContent>
+    </Card>
   );
 }

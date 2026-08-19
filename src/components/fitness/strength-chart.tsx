@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   LineChart,
   Line,
@@ -12,9 +11,13 @@ import {
   Legend,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
+import { ChartContainer } from "@/components/ui/chart-container";
 import { Button } from "@/components/ui/button";
+import { CHART_AXIS, CHART_GRID, chartTooltipProps } from "@/lib/chart-theme";
 import { STRENGTH_TARGETS } from "@/lib/seed";
 import type { StrengthChartPoint } from "@/lib/fitness-metrics";
+import { useState } from "react";
 
 export function StrengthChart({
   strengthData,
@@ -27,29 +30,33 @@ export function StrengthChart({
   const [view, setView] = useState<"strength" | "run">("strength");
 
   const data = strengthData[selectedExercise] ?? [];
+  const axisTick = { fill: CHART_AXIS.stroke, fontSize: CHART_AXIS.fontSize };
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <CardHeaderRow
+          action={
+            <div className="flex gap-1 rounded-sm border border-border-subtle p-0.5">
+              <Button
+                variant={view === "strength" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setView("strength")}
+              >
+                Lifts
+              </Button>
+              <Button
+                variant={view === "run" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setView("run")}
+              >
+                Runs
+              </Button>
+            </div>
+          }
+        >
           <CardTitle>{view === "strength" ? "Strength Progress" : "Run Progress"}</CardTitle>
-          <div className="flex gap-1">
-            <Button
-              variant={view === "strength" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setView("strength")}
-            >
-              Lifts
-            </Button>
-            <Button
-              variant={view === "run" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setView("run")}
-            >
-              Runs
-            </Button>
-          </div>
-        </div>
+        </CardHeaderRow>
       </CardHeader>
       <CardContent>
         {view === "strength" && (
@@ -67,23 +74,17 @@ export function StrengthChart({
           </div>
         )}
 
-        <div className="h-56 w-full lg:h-72">
+        <ChartContainer size="sm">
           {view === "strength" ? (
             data.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
-                  <XAxis dataKey="date" tick={{ fill: "#a1a1aa", fontSize: 10 }} />
-                  <YAxis tick={{ fill: "#a1a1aa", fontSize: 10 }} />
-                  <Tooltip contentStyle={{ background: "#18181b", border: "1px solid #3f3f46" }} />
+                  <CartesianGrid strokeDasharray={CHART_GRID.strokeDasharray} stroke={CHART_GRID.stroke} />
+                  <XAxis dataKey="date" tick={axisTick} tickLine={false} axisLine={false} />
+                  <YAxis tick={axisTick} tickLine={false} axisLine={false} />
+                  <Tooltip {...chartTooltipProps()} />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
-                  <Line
-                    type="monotone"
-                    dataKey="weight"
-                    stroke="#34d399"
-                    name="Top set (lbs)"
-                    dot={false}
-                  />
+                  <Line type="monotone" dataKey="weight" stroke="#34d399" name="Top set (lbs)" dot={false} />
                   <Line
                     type="monotone"
                     dataKey="e1rm"
@@ -92,36 +93,30 @@ export function StrengthChart({
                     dot={false}
                     strokeDasharray="4 4"
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="prWeight"
-                    stroke="#fbbf24"
-                    name="True PR"
-                    dot={false}
-                  />
+                  <Line type="monotone" dataKey="prWeight" stroke="#fbbf24" name="True PR" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <p className="flex h-full items-center justify-center text-sm text-zinc-500">
+              <p className="flex h-full items-center justify-center text-caption text-text-secondary">
                 Log {selectedExercise} workouts or set a manual max to see progress
               </p>
             )
           ) : runData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={runData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#3f3f46" />
-                <XAxis dataKey="date" tick={{ fill: "#a1a1aa", fontSize: 10 }} />
-                <YAxis tick={{ fill: "#a1a1aa", fontSize: 10 }} />
-                <Tooltip contentStyle={{ background: "#18181b", border: "1px solid #3f3f46" }} />
+                <CartesianGrid strokeDasharray={CHART_GRID.strokeDasharray} stroke={CHART_GRID.stroke} />
+                <XAxis dataKey="date" tick={axisTick} tickLine={false} axisLine={false} />
+                <YAxis tick={axisTick} tickLine={false} axisLine={false} />
+                <Tooltip {...chartTooltipProps()} />
                 <Line type="monotone" dataKey="distance" stroke="#60a5fa" name="Distance (mi)" />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <p className="flex h-full items-center justify-center text-sm text-zinc-500">
+            <p className="flex h-full items-center justify-center text-caption text-text-secondary">
               Log runs to see progress
             </p>
           )}
-        </div>
+        </ChartContainer>
       </CardContent>
     </Card>
   );

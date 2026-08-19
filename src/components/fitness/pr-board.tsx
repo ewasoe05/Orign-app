@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Panel } from "@/components/ui/panel";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { formatLocalDate } from "@/lib/utils";
@@ -31,39 +33,41 @@ function ManualPRForm({ exercise }: { exercise: string }) {
   }
 
   return (
-    <form action={action} className="mt-2 grid grid-cols-1 gap-2 rounded-md border border-zinc-800 p-2 sm:grid-cols-2">
-      <input type="hidden" name="exercise" value={exercise} />
-      <div className="col-span-2 space-y-1">
-        <Label htmlFor={`${exercise}-date`}>Date</Label>
-        <Input
-          id={`${exercise}-date`}
-          name="record_date"
-          type="date"
-          defaultValue={formatLocalDate()}
-        />
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor={`${exercise}-weight`}>Weight (lbs)</Label>
-        <Input id={`${exercise}-weight`} name="weight" type="number" step="0.5" required />
-      </div>
-      <div className="space-y-1">
-        <Label htmlFor={`${exercise}-reps`}>Reps</Label>
-        <Input id={`${exercise}-reps`} name="reps" type="number" defaultValue={1} min={1} />
-      </div>
-      <div className="col-span-2 space-y-1">
-        <Label htmlFor={`${exercise}-note`}>Note (optional)</Label>
-        <Input id={`${exercise}-note`} name="note" placeholder="Gym PR, estimated, etc." />
-      </div>
-      {state?.error && <p className="col-span-2 text-xs text-red-400">{state.error}</p>}
-      {state?.success && <p className="col-span-2 text-xs text-emerald-400">Saved.</p>}
-      <div className="col-span-2 flex gap-2">
-        <Button type="submit" size="sm" disabled={pending}>
-          {pending ? "Saving..." : "Save PR"}
-        </Button>
-        <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
-          Cancel
-        </Button>
-      </div>
+    <form action={action} className="mt-2">
+      <Panel className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <input type="hidden" name="exercise" value={exercise} />
+        <div className="col-span-2 space-y-1">
+          <Label htmlFor={`${exercise}-date`}>Date</Label>
+          <Input
+            id={`${exercise}-date`}
+            name="record_date"
+            type="date"
+            defaultValue={formatLocalDate()}
+          />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor={`${exercise}-weight`}>Weight (lbs)</Label>
+          <Input id={`${exercise}-weight`} name="weight" type="number" step="0.5" required />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor={`${exercise}-reps`}>Reps</Label>
+          <Input id={`${exercise}-reps`} name="reps" type="number" defaultValue={1} min={1} />
+        </div>
+        <div className="col-span-2 space-y-1">
+          <Label htmlFor={`${exercise}-note`}>Note (optional)</Label>
+          <Input id={`${exercise}-note`} name="note" placeholder="Gym PR, estimated, etc." />
+        </div>
+        {state?.error && <p className="col-span-2 text-caption text-danger">{state.error}</p>}
+        {state?.success && <p className="col-span-2 text-caption text-accent-muted">Saved.</p>}
+        <div className="col-span-2 flex gap-2">
+          <FormSubmit size="sm" loading={pending}>
+            Save PR
+          </FormSubmit>
+          <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+        </div>
+      </Panel>
     </form>
   );
 }
@@ -90,12 +94,12 @@ export function PRBoard({
 
           return (
             <div key={target.exercise} className="space-y-1">
-              <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-body">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{target.exercise}</span>
                   {pr?.isNewThisWeek && <Badge variant="success">New PR</Badge>}
                 </div>
-                <span className="text-zinc-400">
+                <span className="text-text-secondary">
                   {pr ? `${pr.weight} lbs × ${pr.reps}` : "No data"} / {target.min}–{target.max}{" "}
                   goal
                 </span>
@@ -114,8 +118,8 @@ export function PRBoard({
                 t.exercise.toLowerCase().includes(pr.exercise.toLowerCase()),
             ),
         ).length > 0 && (
-          <div className="border-t border-zinc-800 pt-3">
-            <p className="mb-2 text-xs font-medium text-zinc-500">Other PRs</p>
+          <div className="border-t border-border-subtle pt-3">
+            <p className="mb-2 text-caption font-medium text-text-secondary">Other PRs</p>
             {prs
               .filter(
                 (pr) =>
@@ -127,7 +131,7 @@ export function PRBoard({
               )
               .slice(0, 5)
               .map((pr) => (
-                <p key={pr.exercise} className="text-sm text-zinc-400">
+                <p key={pr.exercise} className="text-body text-text-secondary">
                   {pr.exercise}: {pr.weight} lbs × {pr.reps}
                   {pr.isNewThisWeek ? " · New this week" : ""}
                 </p>

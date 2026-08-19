@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardHeaderRow } from "@/components/ui/card-header-row";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Panel } from "@/components/ui/panel";
 import type { WorkoutTemplateWithExercises, WeeklyScheduleDay } from "@/lib/types";
 
 export function TodayWorkout({
@@ -17,31 +19,36 @@ export function TodayWorkout({
   const isRest = !schedule || schedule.schedule_type === "rest";
 
   return (
-    <Card className="border-emerald-900/50 bg-gradient-to-br from-emerald-950/30 to-zinc-900">
+    <Card elevated>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <CardHeaderRow
+          action={
+            <Badge variant={isRest ? "default" : "success"}>
+              {schedule?.schedule_type ?? "rest"}
+            </Badge>
+          }
+        >
           <CardTitle>Today&apos;s Workout</CardTitle>
-          <Badge variant={isRest ? "default" : "success"}>
-            {schedule?.schedule_type ?? "rest"}
-          </Badge>
-        </div>
+        </CardHeaderRow>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="text-lg font-medium">{schedule?.label ?? "Rest day"}</p>
+      <CardContent>
+        <p className="text-title">{schedule?.label ?? "Rest day"}</p>
 
         {template && template.exercises.length > 0 && (
-          <div className="space-y-1 text-sm text-zinc-400">
+          <Panel className="space-y-1">
             {template.exercises.map((exercise) => (
-              <p key={exercise.id}>
+              <p key={exercise.id} className="text-caption text-text-secondary">
                 {exercise.exercise_name} — {exercise.default_sets}×{exercise.default_reps}
               </p>
             ))}
-          </div>
+          </Panel>
         )}
 
         {!isRest && (
           <Link href={`/fitness?template=${templateId ?? ""}#workout-form`}>
-            <Button className="w-full">Quick log today&apos;s workout</Button>
+            <Button size="touch" className="w-full">
+              Quick log today&apos;s workout
+            </Button>
           </Link>
         )}
       </CardContent>

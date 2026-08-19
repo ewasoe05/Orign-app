@@ -151,15 +151,15 @@ export default async function FitnessPage({
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <CollapsibleSection title="Weekly schedule" description="Set lift, run, and rest days">
+          <CollapsibleSection title="Weekly schedule" description="Set lift, run, and rest days" defaultOpen={false}>
             <ScheduleEditor schedule={schedule} templates={templates} />
           </CollapsibleSection>
-          <CollapsibleSection title="Workout templates" description="Save reusable lift and run templates">
+          <CollapsibleSection title="Workout templates" description="Save reusable lift and run templates" defaultOpen={false}>
             <TemplateManager templates={templates} />
           </CollapsibleSection>
         </div>
 
-        <CollapsibleSection title="Workout history" description="Recent sessions and edits">
+        <CollapsibleSection title="Workout history" description="Recent sessions and edits" defaultOpen={false}>
           <WorkoutHistory workouts={workouts} templates={templates} lastLifts={lastLifts} />
         </CollapsibleSection>
       </div>

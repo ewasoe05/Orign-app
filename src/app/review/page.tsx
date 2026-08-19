@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { ReviewForm } from "@/components/review/review-form";
 import { ReviewHistory } from "@/components/review/review-history";
 import { QuarterlyForm } from "@/components/review/quarterly-form";
@@ -30,12 +31,19 @@ export default async function ReviewPage() {
 
   return (
     <AppShell>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
-        <ReviewForm defaults={defaults} />
-        <ReviewHistory reviews={reviews} />
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:items-start">
+          <ReviewForm defaults={defaults} />
+          <ReviewHistory reviews={reviews} />
+        </div>
+
         <WeeklyReviewReference />
+
         <QuarterlyForm currentQuarter={currentQuarter} />
-        <QuarterlyHistory reviews={quarterly} />
+
+        <CollapsibleSection title="Past checkpoints" description="Quarterly review history">
+          <QuarterlyHistory reviews={quarterly} />
+        </CollapsibleSection>
       </div>
     </AppShell>
   );

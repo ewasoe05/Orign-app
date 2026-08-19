@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Panel } from "@/components/ui/panel";
 import { formatCurrency } from "@/lib/utils";
 import { STRENGTH_TARGETS } from "@/lib/seed";
 import {
@@ -20,12 +21,12 @@ export function StandingSnapshot() {
         <CardTitle>Where you stand</CardTitle>
         <CardDescription>The surplus is temporary. Convert it into assets before it disappears.</CardDescription>
       </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {STARTING_SNAPSHOT.map((row) => (
-          <div key={row.label} className="rounded-lg border border-zinc-800 p-3">
-            <p className="text-xs text-zinc-500">{row.label}</p>
-            <p className="mt-1 text-sm font-medium text-zinc-100">{row.value}</p>
-          </div>
+          <Panel key={row.label}>
+            <p className="text-caption text-text-secondary">{row.label}</p>
+            <p className="mt-1 text-body font-medium text-text-primary">{row.value}</p>
+          </Panel>
         ))}
       </CardContent>
     </Card>
@@ -44,9 +45,9 @@ export function DuplexCashPlan() {
       </CardHeader>
       <CardContent className="space-y-2">
         {DUPLEX_CASH_BREAKDOWN.map((row) => (
-          <div key={row.label} className="flex items-start justify-between gap-3 text-sm">
-            <p className="text-zinc-400">{row.label}</p>
-            <p className="shrink-0 font-medium text-zinc-100">{formatCurrency(row.amount)}</p>
+          <div key={row.label} className="flex items-start justify-between gap-3 text-body">
+            <p className="text-text-secondary">{row.label}</p>
+            <p className="shrink-0 font-medium text-text-primary">{formatCurrency(row.amount)}</p>
           </div>
         ))}
       </CardContent>
@@ -61,8 +62,8 @@ export function PayoffRationale() {
         <CardTitle>Why this payoff order</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-zinc-400">{PAYOFF_RATIONALE}</p>
-        <p className="mt-2 text-sm text-zinc-400">{PAYOFF_RATIONALE_FOOTNOTE}</p>
+        <p className="text-body text-text-secondary">{PAYOFF_RATIONALE}</p>
+        <p className="mt-2 text-body text-text-secondary">{PAYOFF_RATIONALE_FOOTNOTE}</p>
       </CardContent>
     </Card>
   );
@@ -77,10 +78,10 @@ export function BusinessTargets() {
       </CardHeader>
       <CardContent className="space-y-2">
         {BUSINESS_QUARTER_TARGETS.map((row) => (
-          <div key={row.label} className="rounded-lg border border-zinc-800 p-3">
-            <p className="text-sm font-medium">{row.label}</p>
-            <p className="mt-1 text-xs text-zinc-400">{row.target}</p>
-          </div>
+          <Panel key={row.label}>
+            <p className="text-body font-medium">{row.label}</p>
+            <p className="mt-1 text-caption text-text-secondary">{row.target}</p>
+          </Panel>
         ))}
       </CardContent>
     </Card>
@@ -98,11 +99,11 @@ export function FloorsTable() {
       </CardHeader>
       <CardContent className="space-y-2">
         {HABIT_FLOOR_TABLE.map((row) => (
-          <div key={row.habit} className="rounded-lg border border-zinc-800 p-3">
-            <p className="text-sm font-medium">{row.habit}</p>
-            <p className="mt-1 text-xs text-zinc-400">Full: {row.full}</p>
-            <p className="text-xs text-zinc-500">Floor: {row.floor}</p>
-          </div>
+          <Panel key={row.habit}>
+            <p className="text-body font-medium">{row.habit}</p>
+            <p className="mt-1 text-caption text-text-secondary">Full: {row.full}</p>
+            <p className="text-caption text-text-tertiary">Floor: {row.floor}</p>
+          </Panel>
         ))}
       </CardContent>
     </Card>
@@ -118,8 +119,8 @@ export function WeeklyReviewReference() {
       </CardHeader>
       <CardContent className="space-y-2">
         {WEEKLY_REVIEW_QUESTIONS.map((question, index) => (
-          <p key={question.id} className="text-sm text-zinc-400">
-            <span className="text-zinc-300">{index + 1}.</span>             {question.label}
+          <p key={question.id} className="text-body text-text-secondary">
+            <span className="text-text-primary">{index + 1}.</span> {question.label}
             {"detail" in question && question.detail ? ` (${question.detail})` : ""}
           </p>
         ))}
@@ -137,20 +138,20 @@ export function FitnessTargetsCard() {
       </CardHeader>
       <CardContent className="space-y-2">
         {STRENGTH_TARGETS.map((target) => (
-          <div key={target.exercise} className="flex justify-between text-sm">
-            <span className="text-zinc-400">{target.exercise}</span>
-            <span className="text-zinc-100">
+          <div key={target.exercise} className="flex justify-between text-body">
+            <span className="text-text-secondary">{target.exercise}</span>
+            <span className="text-text-primary">
               {target.min}–{target.max} lbs
             </span>
           </div>
         ))}
-        <div className="flex justify-between text-sm">
-          <span className="text-zinc-400">Longest run</span>
-          <span className="text-zinc-100">{FITNESS_BODY_TARGETS.longestRun}</span>
+        <div className="flex justify-between text-body">
+          <span className="text-text-secondary">Longest run</span>
+          <span className="text-text-primary">{FITNESS_BODY_TARGETS.longestRun}</span>
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-zinc-400">Body</span>
-          <span className="text-zinc-100">{FITNESS_BODY_TARGETS.body}</span>
+        <div className="flex justify-between text-body">
+          <span className="text-text-secondary">Body</span>
+          <span className="text-text-primary">{FITNESS_BODY_TARGETS.body}</span>
         </div>
       </CardContent>
     </Card>

@@ -2,10 +2,10 @@
 
 import { useActionState } from "react";
 import { signUp } from "@/lib/actions/auth";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
 import Link from "next/link";
 
 export function SignUpForm() {
@@ -32,14 +32,14 @@ export function SignUpForm() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" name="password" type="password" required minLength={6} autoComplete="new-password" />
           </div>
-          {state?.error && <p className="text-sm text-red-400">{state.error}</p>}
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Creating..." : "Create account"}
-          </Button>
+          {state?.error && <p className="text-caption text-danger">{state.error}</p>}
+          <FormActions>
+            <FormSubmit loading={pending}>Create account</FormSubmit>
+          </FormActions>
         </form>
-        <p className="mt-4 text-center text-sm text-zinc-400">
+        <p className="mt-4 text-center text-caption text-text-secondary">
           Already have an account?{" "}
-          <Link href="/login" className="text-emerald-400 hover:underline">
+          <Link href="/login" className="underline-offset-2 hover:text-text-primary hover:underline">
             Sign in
           </Link>
         </p>

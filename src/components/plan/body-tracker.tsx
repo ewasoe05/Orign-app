@@ -2,10 +2,11 @@
 
 import { useActionState } from "react";
 import { logBody } from "@/lib/actions/plan";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Panel } from "@/components/ui/panel";
+import { FormActions, FormSubmit } from "@/components/ui/form-actions";
 import { PROTEIN_TARGET_G, STARTING_WEIGHT_LBS, TARGET_WEIGHT_LBS } from "@/lib/seed";
 import { formatLocalDate } from "@/lib/utils";
 import type { BodyLog } from "@/lib/types";
@@ -35,11 +36,11 @@ export function BodyTracker({
           {PROTEIN_TARGET_G}g/day — hitting it marks Eating full.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="rounded-md border border-zinc-800 p-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-zinc-400">Protein · last 7 days</span>
-            <span className="font-medium text-zinc-200">
+      <CardContent>
+        <Panel>
+          <div className="flex items-center justify-between text-body">
+            <span className="text-text-secondary">Protein · last 7 days</span>
+            <span className="font-medium text-text-primary">
               {proteinStats.hits}/{proteinStats.days} at {PROTEIN_TARGET_G}g+
             </span>
           </div>
@@ -50,24 +51,24 @@ export function BodyTracker({
                 title={`${day.date.slice(5)}: ${day.hit ? "hit" : day.logged ? "below target" : "not logged"}`}
                 className={`h-2 flex-1 rounded-full ${
                   day.hit
-                    ? "bg-emerald-500"
+                    ? "bg-accent-muted"
                     : day.logged
-                      ? "bg-amber-600/60"
-                      : "bg-zinc-800"
+                      ? "bg-warning/60"
+                      : "bg-border-subtle"
                 }`}
               />
             ))}
           </div>
-        </div>
+        </Panel>
 
         {latest && (
-          <p className="text-sm text-zinc-300">
+          <p className="text-body text-text-secondary">
             Last: {latest.log_date}
             {latest.weight_lbs ? ` · ${latest.weight_lbs} lbs` : ""}
             {latest.protein_grams ? ` · ${latest.protein_grams}g protein` : ""}
           </p>
         )}
-        <form action={action} className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <form action={action} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="col-span-2 space-y-1">
             <Label htmlFor="log_date">Date</Label>
             <Input id="log_date" name="log_date" type="date" defaultValue={formatLocalDate()} />
@@ -80,11 +81,11 @@ export function BodyTracker({
             <Label htmlFor="protein_grams">Protein (g)</Label>
             <Input id="protein_grams" name="protein_grams" type="number" placeholder="170" />
           </div>
-          {state?.error && <p className="col-span-2 text-sm text-red-400">{state.error}</p>}
-          {state?.success && <p className="col-span-2 text-sm text-emerald-400">Logged.</p>}
-          <Button type="submit" className="col-span-2" disabled={pending}>
-            {pending ? "Saving..." : "Log body / protein"}
-          </Button>
+          {state?.error && <p className="col-span-2 text-caption text-danger">{state.error}</p>}
+          {state?.success && <p className="col-span-2 text-caption text-accent-muted">Logged.</p>}
+          <FormActions className="col-span-2 pt-0">
+            <FormSubmit loading={pending}>Log body / protein</FormSubmit>
+          </FormActions>
         </form>
       </CardContent>
     </Card>
