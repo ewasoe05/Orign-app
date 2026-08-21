@@ -85,6 +85,7 @@ export async function reorderDebtAccounts(accountIds: string[]) {
   revalidatePath("/");
   revalidatePath("/debt");
   revalidatePath("/savings");
+  revalidatePath("/paycheck");
   revalidatePath("/plan");
   return { success: true };
 }
@@ -144,6 +145,7 @@ export async function logPayment(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/debt");
   revalidatePath("/savings");
+  revalidatePath("/paycheck");
   await upsertHabitLevel("money", "full", paymentDate);
   return { success: true };
 }

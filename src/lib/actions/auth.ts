@@ -120,6 +120,13 @@ export async function seedUserData(userId: string) {
     } catch (error) {
       console.error("seedPhase2Data failed", error);
     }
+
+    const { seedPaycheckData } = await import("@/lib/paycheck-seed");
+    try {
+      await seedPaycheckData(supabase, userId);
+    } catch (error) {
+      console.error("seedPaycheckData failed", error);
+    }
   } catch (error) {
     console.error("seedUserData failed", error);
   }
