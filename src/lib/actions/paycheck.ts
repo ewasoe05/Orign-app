@@ -38,7 +38,7 @@ import type {
   PaycheckPhase,
 } from "@/lib/types";
 
-export const PAYCHECK_HISTORY_LIMIT = 12;
+const PAYCHECK_HISTORY_LIMIT = 12;
 
 type ActionResult = {
   error?: string;
