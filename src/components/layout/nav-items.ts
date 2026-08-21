@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
+  Banknote,
   DollarSign,
   PiggyBank,
   Dumbbell,
@@ -18,6 +19,7 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", mobileLabel: "Home", desktopLabel: "Dashboard", icon: LayoutDashboard },
+  { href: "/paycheck", mobileLabel: "Pay", desktopLabel: "Paycheck", icon: Banknote },
   { href: "/debt", mobileLabel: "Debt", desktopLabel: "Debt", icon: DollarSign },
   { href: "/savings", mobileLabel: "Save", desktopLabel: "Savings", icon: PiggyBank },
   { href: "/fitness", mobileLabel: "Fit", desktopLabel: "Fitness", icon: Dumbbell },

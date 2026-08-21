@@ -80,6 +80,52 @@ export interface UserSettings {
   created_at: string;
 }
 
+export type PaycheckLineType = "hold" | "fun" | "debt" | "save";
+export type PaycheckEntryKind = "paycheck" | "sweep";
+export type PaycheckPhase = "debt" | "savings";
+
+export interface PaycheckLine {
+  label: string;
+  amount: number;
+  type: PaycheckLineType;
+  subLabel?: string;
+  accountId?: string;
+  balanceAfter?: number;
+}
+
+export interface PaycheckSettings {
+  id: string;
+  user_id: string;
+  essentials_per_check: number;
+  extra_target: number;
+  unswept_buffer: number;
+  confirmed: boolean;
+  fun_percent: number;
+  fun_allocated_total: number;
+  emergency_fund_target: number;
+  milestone_mid_percent: number;
+  milestone_near_percent: number;
+  created_at: string;
+  hysa_goal: number;
+  hysa_balance: number;
+}
+
+export interface PaycheckEntry {
+  id: string;
+  user_id: string;
+  kind: PaycheckEntryKind;
+  entry_date: string;
+  amount: number;
+  essentials: number;
+  to_plan: number;
+  fun_amount: number;
+  fun_percent_used: number;
+  leftover: number;
+  milestone: string | null;
+  lines: PaycheckLine[];
+  created_at: string;
+}
+
 export interface WorkoutWithDetails extends Workout {
   lift_entries: LiftEntry[];
   run_entries: RunEntry[];

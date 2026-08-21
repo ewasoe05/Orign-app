@@ -19,6 +19,7 @@ function revalidateSavings() {
   revalidatePath("/");
   revalidatePath("/savings");
   revalidatePath("/review");
+  revalidatePath("/paycheck");
 }
 
 export async function getSavingsSettings(): Promise<SavingsSettings | null> {
