@@ -30,7 +30,7 @@ export function PaycheckRouteForm({ settings }: { settings: PaycheckSettings }) 
   const [amount, setAmount] = useState("");
   const [funPercent, setFunPercent] = useState(clampFunPercent(Number(settings.fun_percent)));
 
-  const parsedAmount = Number(amount);
+  const parsedAmount = Number(amount.replace(/[$,\s]/g, ""));
   const preview = useMemo(() => {
     const value = Number.isFinite(parsedAmount) && parsedAmount > 0 ? parsedAmount : 0;
     return previewFunSplit(value, toRouterSettings(settings), funPercent);
@@ -51,15 +51,13 @@ export function PaycheckRouteForm({ settings }: { settings: PaycheckSettings }) 
             <Input
               id="amount"
               name="amount"
-              type="number"
+              type="text"
               inputMode="decimal"
-              step="0.01"
-              min="0.01"
+              autoComplete="off"
               placeholder="2000.00"
               required
-              value={amount}
+              defaultValue=""
               onChange={(event) => setAmount(event.target.value)}
-              disabled={blocked}
             />
           </div>
           <div className="space-y-2">
@@ -70,7 +68,6 @@ export function PaycheckRouteForm({ settings }: { settings: PaycheckSettings }) 
               type="date"
               defaultValue={formatLocalDate()}
               required
-              disabled={blocked}
             />
           </div>
           <div className="space-y-2">
@@ -88,7 +85,6 @@ export function PaycheckRouteForm({ settings }: { settings: PaycheckSettings }) 
               value={funPercent}
               onChange={(event) => setFunPercent(clampFunPercent(Number(event.target.value)))}
               className="w-full accent-accent"
-              disabled={blocked}
             />
             <div className="flex justify-between text-caption text-text-secondary">
               <span>More debt-crushing</span>
