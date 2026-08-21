@@ -70,7 +70,7 @@ function money(value: number): number {
 }
 
 function parseMoney(value: FormDataEntryValue | null, { allowZero = true } = {}): number | null {
-  const raw = String(value ?? "").trim();
+  const raw = String(value ?? "").trim().replace(/[$,]/g, "");
   if (!raw) return null;
   const parsed = Number(raw);
   if (!Number.isFinite(parsed)) return null;
